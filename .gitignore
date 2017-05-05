@@ -1,3 +1,7 @@
 .idea
 venv_counter
-main.c
+*.c
+build
+__pycache__
+*.pyc
+*.pyd
