@@ -8,6 +8,8 @@ from Cython.Distutils import build_ext
 
 ext_modules = [
     Extension("ui.mainWindow", ["ui/mainWindow.py"]),
+    Extension("models.account", ["models/account.py"]),
+    Extension("dbmanager.dbmanager", ["dbmanager/dbmanager.py"]),
     ]
 
 setup(

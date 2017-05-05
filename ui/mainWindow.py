@@ -2,6 +2,7 @@
 
 from tkinter import *
 import tkinter.ttk as ttk
+import dbmanager.dbmanager as dbmanager
 
 
 class MainWindow:
@@ -19,7 +20,9 @@ class MainWindow:
         self.root.mainloop()
 
     def action(self, event):
-        self.lblVar.set("Hello world!!!")
+        #self.lblVar.set("Hello world!!!")
+        dbmanager.create_tables()
+        dbmanager.create_account("user", "123456")
 
 
 if __name__ == "__main__":
