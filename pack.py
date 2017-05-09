@@ -12,7 +12,12 @@ os.environ['TK_LIBRARY'] = 'c:/Python36-32/tcl/tk8.6'
 buildOptions = dict(
     packages = ["tkinter","peewee"],
     excludes = [],
-    includes = ["dbmanager", "dbmanager.dbmanager", "models", "models.account"],
+    includes = ["dbmanager",
+                "dbmanager.dbmanager",
+                "models",
+                "models.account",
+                "instagram_api",
+                "instagram_api.auth_provider"],
     include_files=['c:/Python36-32/DLLs/tcl86t.dll',
                    'c:/Python36-32/DLLs/tk86t.dll',
                    'c:/Python36-32/DLLs/sqlite3.dll']
