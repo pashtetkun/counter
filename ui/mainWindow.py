@@ -4,13 +4,14 @@ from tkinter import *
 import tkinter.ttk as ttk
 import dbmanager.dbmanager as dbmanager
 from instagram_api import auth_provider
+from ui.mainTabPanel import MainTabPanel
 
 
 class MainWindow:
     def __init__(self):
         self.root = Tk()
         self.root.geometry('640x480+400+90')
-        self.but = ttk.Button(self.root, text='Жми')
+        '''self.but = ttk.Button(self.root, text='Жми')
         self.but.bind("<Button-1>", self.action)
         self.but.pack()
 
@@ -24,7 +25,10 @@ class MainWindow:
 
         self.lblVar2 = StringVar()
         self.lbl2 = ttk.Label(self.root, textvariable=self.lblVar2)
-        self.lbl2.pack()
+        self.lbl2.pack()'''
+
+        self.mainTabPanel = MainTabPanel(self.root)
+        self.mainTabPanel.pack()
 
         self.root.mainloop()
 
