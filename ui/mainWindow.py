@@ -8,9 +8,11 @@ from ui.mainTabPanel import MainTabPanel
 
 
 class MainWindow:
-    def __init__(self):
+    def __init__(self, width, height):
         self.root = Tk()
-        self.root.geometry('640x480+400+90')
+        self.hs = self.root.winfo_screenheight()
+        self.ws = self.root.winfo_screenwidth()
+        self.root.geometry('%dx%d+%d+%d' % (width, height, (self.ws-width)//2, (self.hs-height)//2))
         '''self.but = ttk.Button(self.root, text='Жми')
         self.but.bind("<Button-1>", self.action)
         self.but.pack()
@@ -44,4 +46,4 @@ class MainWindow:
 
 
 if __name__ == "__main__":
-    mainWindow = MainWindow();
+    mainWindow = MainWindow(1000, 500);

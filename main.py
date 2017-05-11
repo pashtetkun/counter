@@ -4,4 +4,4 @@ from ui import mainWindow
 
 
 if __name__ == "__main__":
-    mainWindow.MainWindow()
+    mainWindow.MainWindow(1000, 500)
