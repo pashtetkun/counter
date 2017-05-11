@@ -15,6 +15,7 @@ class MainWindow:
         self.hs = self.root.winfo_screenheight()
         self.ws = self.root.winfo_screenwidth()
         self.root.geometry('%dx%d+%d+%d' % (width, height, (self.ws-width)//2, (self.hs-height)//2))
+        self.root.resizable(width=False, height=False)
         '''self.but = ttk.Button(self.root, text='Жми')
         self.but.bind("<Button-1>", self.action)
         self.but.pack()
