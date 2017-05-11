@@ -5,11 +5,13 @@ import tkinter.ttk as ttk
 import dbmanager.dbmanager as dbmanager
 from instagram_api import auth_provider
 from ui.mainTabPanel import MainTabPanel
+from ttkthemes import themed_tk as tk
 
 
 class MainWindow:
     def __init__(self, width, height):
-        self.root = Tk()
+        self.root = tk.ThemedTk()
+        self.root.set_theme("kroc")
         self.hs = self.root.winfo_screenheight()
         self.ws = self.root.winfo_screenwidth()
         self.root.geometry('%dx%d+%d+%d' % (width, height, (self.ws-width)//2, (self.hs-height)//2))

@@ -11,16 +11,11 @@ class MainTabPanel(ttk.Notebook):
         self.style = ttk.Style()
 
         print(self.style.theme_names())
-        '''self.style.theme_create("MyStyle", parent="alt", settings={
-            "TNotebook": {"configure": {"tabmargins": [2, 5, 2, 0]}},
-            "TNotebook.Tab": {"configure": {"padding": [50, 50]}, }})
 
-        self.style.theme_use("MyStyle")'''
-
-        self.style.theme_settings("default", {
+        '''self.style.theme_settings("default", {
             "TNotebook": {"configure": {"tabmargins": [2, 5, 2, 0]}},
             "TNotebook.Tab": {"configure": {"padding": [50, 50]}, "minwidth": 200}})
-        self.style.theme_use("default")
+        self.style.theme_use("default")'''
 
         ttk.Notebook.__init__(self, parent)
         self.pack()

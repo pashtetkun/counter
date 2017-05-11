@@ -3,6 +3,7 @@
 
 from tkinter import *
 import tkinter.ttk as ttk
+from ttkthemes import themed_tk as tk
 
 
 class ProjectsManager(ttk.Frame):
@@ -99,6 +100,8 @@ class ProjectsManager(ttk.Frame):
 
 
 if __name__ == "__main__":
-    root = Tk()
+    root = tk.ThemedTk()
+    print(root.get_themes())  # Returns a list of all themes that can be set
+    root.set_theme("radiance")
     projectsManager = ProjectsManager(root);
     root.mainloop()

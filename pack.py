@@ -10,7 +10,7 @@ os.environ['TK_LIBRARY'] = 'c:/Python36-32/tcl/tk8.6'
 # Dependencies are automatically detected, but it might need
 # fine tuning.
 buildOptions = dict(
-    packages = ["tkinter","peewee"],
+    packages = ["tkinter","peewee","ttkthemes"],
     excludes = [],
     includes = ["dbmanager",
                 "dbmanager.dbmanager",
