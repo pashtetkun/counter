@@ -3,7 +3,7 @@
 
 from tkinter import *
 import tkinter.ttk as ttk
-from ui import projectsManager
+from ui import tasksManager
 
 
 class MainTabPanel(ttk.Notebook):
@@ -16,16 +16,16 @@ class MainTabPanel(ttk.Notebook):
             "TNotebook": {"configure": {"tabmargins": [2, 5, 2, 0]}},
             "TNotebook.Tab": {"configure": {"padding": [50, 50]}, "minwidth": 200}})
         self.style.theme_use("default")'''
+        #self.style.configure('MainTab.TNotebook.Tab', minwidth=200)
 
         ttk.Notebook.__init__(self, parent)
         self.pack()
-        #self.mainTabPanel = ttk.Notebook(parent)
-        #self.mainTabPanel.pack()
-        self.projectsManager = projectsManager.ProjectsManager(self)
+
+        self.projectsManager = ttk.Frame(self)
         self.add(self.projectsManager,     text='Менеджер проектов')
 
-        self.tasksManager = ttk.Frame(self)
-        self.add(self.tasksManager,        text='Менеджер заданий ', state="disabled")
+        self.tasksManager = tasksManager.TasksManager(self)
+        self.add(self.tasksManager,        text='Менеджер заданий ')
 
         self.accumulationManager = ttk.Frame(self)
         self.add(self.accumulationManager, text=' Сбор аудитории  ', state="disabled")
@@ -35,6 +35,8 @@ class MainTabPanel(ttk.Notebook):
 
         self.logsManager = ttk.Frame(self)
         self.add(self.logsManager,         text='    Логи         ', state="disabled")
+
+        self.select(1)
 
 
 if __name__ == "__main__":
