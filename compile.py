@@ -9,7 +9,7 @@ from Cython.Distutils import build_ext
 ext_modules = [
     Extension("ui.mainWindow", ["ui/mainWindow.py"]),
     Extension("ui.mainTabPanel", ["ui/mainTabPanel.py"]),
-    Extension("ui.projectsManager", ["ui/tasksManager.py"]),
+    Extension("ui.tasksManager", ["ui/tasksManager.py"]),
     Extension("models.account", ["models/account.py"]),
     Extension("dbmanager.dbmanager", ["dbmanager/dbmanager.py"]),
     ]

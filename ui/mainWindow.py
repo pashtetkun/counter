@@ -6,6 +6,7 @@ import dbmanager.dbmanager as dbmanager
 from instagram_api import auth_provider
 from ui.mainTabPanel import MainTabPanel
 from ttkthemes import themed_tk as tk
+import os
 
 
 class MainWindow:
@@ -35,6 +36,9 @@ class MainWindow:
         self.mainTabPanel = MainTabPanel(self.root)
         self.mainTabPanel.pack()
 
+        current_dir = os.getcwd()
+        print(current_dir)
+        self.root.iconbitmap('smoking.ico')
         self.root.mainloop()
 
     def action(self, event):

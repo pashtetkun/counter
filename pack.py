@@ -20,14 +20,15 @@ buildOptions = dict(
                 "instagram_api.auth_provider"],
     include_files=['c:/Python36-32/DLLs/tcl86t.dll',
                    'c:/Python36-32/DLLs/tk86t.dll',
-                   'c:/Python36-32/DLLs/sqlite3.dll']
+                   'c:/Python36-32/DLLs/sqlite3.dll',
+                   os.path.join(os.getcwd(), 'smoking.ico')]
 )
 
 import sys
 base = 'Win32GUI' if sys.platform=='win32' else None
 
 executables = [
-    Executable('main.py', base = base)
+    Executable('main.py', base = base, icon="smoking.ico")
 ]
 
 setup(

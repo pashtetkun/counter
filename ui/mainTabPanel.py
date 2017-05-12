@@ -22,7 +22,7 @@ class MainTabPanel(ttk.Notebook):
         self.pack()
 
         self.projectsManager = ttk.Frame(self)
-        self.add(self.projectsManager,     text='Менеджер проектов')
+        self.add(self.projectsManager,     text='Менеджер проектов', state="disabled")
 
         self.tasksManager = tasksManager.TasksManager(self)
         self.add(self.tasksManager,        text='Менеджер заданий ')
