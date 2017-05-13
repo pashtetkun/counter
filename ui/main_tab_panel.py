@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from tkinter import *
+import tkinter as tk
 import tkinter.ttk as ttk
-from ui import tasksManager
+from ui import tasks_manager
 
 
 class MainTabPanel(ttk.Notebook):
@@ -21,31 +21,31 @@ class MainTabPanel(ttk.Notebook):
         ttk.Notebook.__init__(self, parent)
         self.pack()
 
-        self.projectsManager = ttk.Frame(self)
-        self.add(self.projectsManager,     text='Менеджер проектов', state="disabled")
+        self.projects_manager = ttk.Frame(self)
+        self.add(self.projects_manager,     text='Менеджер проектов', state="disabled")
 
-        self.tasksManager = tasksManager.TasksManager(self)
-        self.add(self.tasksManager,        text='Менеджер заданий ')
+        self.tasks_manager = tasks_manager.TasksManager(self)
+        self.add(self.tasks_manager, text='Менеджер заданий ')
 
-        self.accumulationManager = ttk.Frame(self)
-        self.add(self.accumulationManager, text=' Сбор аудитории  ', state="disabled")
+        self.accumulation_manager = ttk.Frame(self)
+        self.add(self.accumulation_manager, text=' Сбор аудитории  ', state="disabled")
 
-        self.settingsManager = ttk.Frame(self)
-        self.add(self.settingsManager,     text='    Настройки    ', state="disabled")
+        self.settings_manager = ttk.Frame(self)
+        self.add(self.settings_manager, text='    Настройки    ', state="disabled")
 
-        self.logsManager = ttk.Frame(self)
-        self.add(self.logsManager,         text='    Логи         ', state="disabled")
+        self.logs_manager = ttk.Frame(self)
+        self.add(self.logs_manager, text='    Логи         ', state="disabled")
 
         self.select(1)
 
 
 if __name__ == "__main__":
-    root = Tk()
+    root = tk.Tk()
     width = 1000
     height = 500
     hs = root.winfo_screenheight()
     ws = root.winfo_screenwidth()
     root.geometry('%dx%d+%d+%d' % (width, height, (ws - width) // 2, (hs - height) // 2))
-    mainTabPanel = MainTabPanel(root)
+    main_tab_panel = MainTabPanel(root)
     root.mainloop()
 

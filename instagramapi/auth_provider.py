@@ -10,14 +10,14 @@ USER_AGENT = ("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 "
 ACCEPT_LANGUAGE = 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
 
 
-def get_csrf_token():
+def get_csrftoken():
     headers = {'User-Agent': USER_AGENT}
     with requests.Session() as session:
         resp = session.get(ROOT_URL, headers=headers)
         return resp.cookies['csrftoken']
 
 
-def doLogin(login, password):
+def do_login(login, password):
 
     result = False
     """headers = {}
@@ -72,5 +72,5 @@ def doLogin(login, password):
 
 if __name__ == "__main__":
     #csrftoken = get_csrf_token()
-    doLogin("ptsibizov", "animes12")
+    do_login("ptsibizov", "animes12")
 

@@ -1,10 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from peewee import *
+import peewee as pw
 from models import account
 
-db = SqliteDatabase('data.db')
+db = pw.SqliteDatabase('data.db')
 
 
 def create_tables():

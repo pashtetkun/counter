@@ -1,14 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from peewee import *
+import peewee as pw
 
-db = SqliteDatabase('data.db')
+db = pw.SqliteDatabase('data.db')
 
 
-class Account(Model):
-    login = CharField()
-    password = CharField()
+class Account(pw.Model):
+    login = pw.CharField()
+    password = pw.CharField()
 
     class Meta:
         database = db # This model uses the "people.db" database.
