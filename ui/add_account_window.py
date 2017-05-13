@@ -2,10 +2,11 @@
 
 import tkinter as tk
 import tkinter.ttk as ttk
+from instagramapi import auth_provider
 
 
 class AddAccountWindow(tk.Toplevel):
-    def __init__(self, width, height, parent):
+    def __init__(self, width, height, parent, callback):
         tk.Toplevel.__init__(self, height=height, width=width)
 
         self.title("Добавить аккаунт")
@@ -16,20 +17,36 @@ class AddAccountWindow(tk.Toplevel):
 
         self.label_login = ttk.Label(self, text='Логин')
         self.label_login.grid(row=0, column=0)
-        self.entry_login = ttk.Entry(self)
+        self.var_login = tk.StringVar()
+        self.entry_login = ttk.Entry(self, textvariable=self.var_login)
         self.entry_login.grid(row=0, column=1)
         self.label_password = ttk.Label(self, text='Пароль')
         self.label_password.grid(row=1, column=0)
-        self.entry_password = ttk.Entry(self)
+        self.var_password = tk.StringVar()
+        self.entry_password = ttk.Entry(self, textvariable=self.var_password)
         self.entry_password.grid(row=1, column=1)
-        self.button_save = ttk.Button(self, text="Сохранить")
+        self.button_save = ttk.Button(self, text="Сохранить", command=self.save)
         self.button_save.grid(row=2, column=0, columnspan=2)
+        self.var_message = tk.StringVar()
+        self.label_message = ttk.Label(self, textvariable=self.var_message)
+        self.label_message.grid(row=3, column=0, columnspan=2)
 
         self.rowconfigure(0, minsize=20, weight=1)
         self.rowconfigure(1, minsize=20, weight=1)
         self.rowconfigure(2, minsize=20, weight=1)
+        self.rowconfigure(3, minsize=20, weight=1)
         self.columnconfigure(0, minsize=100, weight=1)
         self.columnconfigure(1, minsize=100, weight=1)
+
+        self.callback = callback
+
+    def save(self):
+        check = auth_provider.do_login(self.var_login.get(), self.var_password.get())
+        if not check:
+            self.var_message.set("Ошибка аутентификации")
+        else:
+            self.callback(self.var_login.get(), self.var_password.get())
+            self.destroy()
 
 
 if __name__ == "__main__":

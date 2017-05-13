@@ -3,6 +3,24 @@
 
 import tkinter.ttk as ttk
 from ttkthemes import themed_tk as tk
+from ui import add_account_window
+from dbmanager import dbmanager
+
+
+class TableTasks(ttk.Treeview):
+    def __init__(self, parent):
+        ttk.Treeview.__init__(self, parent)
+
+        self.columns = ("Логин", "Задание", "Статус", "Подписки", "Подписчики", "Прогресс")
+        self.configure(show="headings", selectmode="browse", columns=self.columns)
+        for col in self.columns:
+            self.heading(col, text=col)
+            self.column(col, width=150)
+
+    def add_tasks_info(self, tasks_info):
+        for task_info in tasks_info:
+            self.insert('', 'end',
+                        values=(task_info["login"], '', '', '', '', ''))
 
 
 class TasksManager(ttk.Frame):
@@ -18,16 +36,18 @@ class TasksManager(ttk.Frame):
 
         self.table1.grid(row=0, column=0)
 
-        self.table2_columns = ("Логин", "Задание", "Статус", "Подписки", "Подписчики", "Прогресс")
+        '''self.table2_columns = ("Логин", "Задание", "Статус", "Подписки", "Подписчики", "Прогресс")
         self.table2 = ttk.Treeview(self, show="headings", selectmode="browse",
                                   columns=self.table2_columns)
         for col in self.table2_columns:
             self.table2.heading(col, text=col)
-            self.table2.column(col, width=150)
+            self.table2.column(col, width=150)'''
+        self.table_tasks = TableTasks(self)
 
-        self.table2.grid(row=0, column=1, columnspan=5)
+        self.table_tasks.grid(row=0, column=1, columnspan=5)
 
-        self.button_add_account = ttk.Button(self, text='Добавить аккаунт')
+        self.button_add_account = ttk.Button(self, text='Добавить аккаунт',
+                                             command=self.open_add_account_window)
         self.button_add_account.grid(row=1, column=0, sticky="nesw")
         self.button_del_account = ttk.Button(self, text='Удалить аккаунт')
         self.button_del_account.grid(row=2, column=0, sticky="nesw")
@@ -64,6 +84,16 @@ class TasksManager(ttk.Frame):
         self.columnconfigure(3, minsize=100, weight=1)
         self.columnconfigure(4, minsize=100, weight=1)
         self.columnconfigure(5, minsize=100, weight=1)
+
+    def add_account_callback(self, login, password):
+        dbmanager.create_tables()
+        dbmanager.create_account(login, password)
+        self.table_tasks.add_tasks_info([{"login": login}])
+
+
+    def open_add_account_window(self):
+        form = add_account_window.AddAccountWindow(250, 200, self.winfo_toplevel(),
+                                                   self.add_account_callback)
 
 
 if __name__ == "__main__":
