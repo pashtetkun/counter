@@ -7,7 +7,7 @@ from ttkthemes import themed_tk as tk
 class MainWindow:
     def __init__(self, width, height):
         self.root = tk.ThemedTk()
-        self.root.set_theme("kroc")
+        self.root.set_theme("radiance")
         self.hs = self.root.winfo_screenheight()
         self.ws = self.root.winfo_screenwidth()
         self.root.geometry('%dx%d+%d+%d' % (width, height, (self.ws-width)//2, (self.hs-height)//2))

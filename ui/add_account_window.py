@@ -2,15 +2,16 @@
 
 import tkinter as tk
 import tkinter.ttk as ttk
-from instagramapi import auth_provider
+import instagramapi as api
 
 
 class AddAccountWindow(tk.Toplevel):
-    def __init__(self, width, height, parent, callback):
+    def __init__(self, width, height, parent, callback=None):
         tk.Toplevel.__init__(self, height=height, width=width)
 
         self.title("Добавить аккаунт")
         self.transient(parent)
+        self.grab_set()
         hs = self.winfo_screenheight()
         ws = self.winfo_screenwidth()
         self.geometry('%dx%d+%d+%d' % (width, height, (ws - width) // 2, (hs - height) // 2))
@@ -41,11 +42,12 @@ class AddAccountWindow(tk.Toplevel):
         self.callback = callback
 
     def save(self):
-        check = auth_provider.do_login(self.var_login.get(), self.var_password.get())
-        if not check:
-            self.var_message.set("Ошибка аутентификации")
+        resp = api.do_login(self.var_login.get(), self.var_password.get())
+        if not resp.success:
+            self.var_message.set(resp.message)
         else:
-            self.callback(self.var_login.get(), self.var_password.get())
+            if self.callback:
+                self.callback(self.var_login.get(), self.var_password.get())
             self.destroy()
 
 
@@ -56,5 +58,5 @@ if __name__ == "__main__":
     hs = root.winfo_screenheight()
     ws = root.winfo_screenwidth()
     root.geometry('%dx%d+%d+%d' % (width, height, (ws - width) // 2, (hs - height) // 2))
-    add_account_window = AddAccountWindow(250, 200, root)
+    add_account_window = AddAccountWindow(250, 200, root, )
     root.mainloop()

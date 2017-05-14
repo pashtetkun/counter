@@ -10,7 +10,7 @@ ext_modules = [
     Extension("ui.mainWindow", ["ui/main_window.py"]),
     Extension("ui.mainTabPanel", ["ui/main_tab_panel.py"]),
     Extension("ui.tasksManager", ["ui/tasks_manager.py"]),
-    Extension("models.account", ["models/account.py"]),
+    Extension("models", ["models/__init__.py"]),
     Extension("dbmanager.dbmanager", ["dbmanager/dbmanager.py"]),
     ]
 

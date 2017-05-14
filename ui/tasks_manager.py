@@ -17,10 +17,17 @@ class TableTasks(ttk.Treeview):
             self.heading(col, text=col)
             self.column(col, width=150)
 
-    def add_tasks_info(self, tasks_info):
+    '''def add_tasks_info(self, tasks_info):
         for task_info in tasks_info:
             self.insert('', 'end',
-                        values=(task_info["login"], '', '', '', '', ''))
+                        values=(task_info["login"], '', '', '', '', ''))'''
+
+    def refresh(self):
+        self.delete()
+        accounts = dbmanager.get_all_accounts()
+        for account in accounts:
+            self.insert('', 'end',
+                        values=(account.login, '', '', '', '', ''))
 
 
 class TasksManager(ttk.Frame):
@@ -85,10 +92,14 @@ class TasksManager(ttk.Frame):
         self.columnconfigure(4, minsize=100, weight=1)
         self.columnconfigure(5, minsize=100, weight=1)
 
+        self.table_tasks.refresh()
+
     def add_account_callback(self, login, password):
-        dbmanager.create_tables()
-        dbmanager.create_account(login, password)
-        self.table_tasks.add_tasks_info([{"login": login}])
+        if dbmanager.create_account(login, password):
+            self.table_tasks.refresh()
+        #self.table_tasks.add_tasks_info([{"login": login}])
+        #accounts = dbmanager.get_all_accounts()
+
 
 
     def open_add_account_window(self):
@@ -100,5 +111,6 @@ if __name__ == "__main__":
     root = tk.ThemedTk()
     print(root.get_themes())  # Returns a list of all themes that can be set
     root.set_theme("radiance")
+    dbmanager.initialize()
     projects_manager = TasksManager(root);
     root.mainloop()
