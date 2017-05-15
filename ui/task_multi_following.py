@@ -159,7 +159,7 @@ class TaskMultiFollowingWindow(tk.Toplevel):
 
 if __name__ == "__main__":
     root = thk.ThemedTk()
-    root.set_theme("radiance")
+    root.set_theme("vista")
     width = 1000
     height = 500
     hs = root.winfo_screenheight()
