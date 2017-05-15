@@ -3,7 +3,7 @@
 
 import tkinter.ttk as ttk
 from ttkthemes import themed_tk as tk
-from ui import add_account_window
+from ui import add_account_window, task_multi_following
 from dbmanager import dbmanager
 
 
@@ -59,7 +59,8 @@ class TasksManager(ttk.Frame):
         self.button_del_account = ttk.Button(self, text='Удалить аккаунт')
         self.button_del_account.grid(row=2, column=0, sticky="nesw")
 
-        self.button_add_task = ttk.Button(self, text='Добавить задание')
+        self.button_add_task = ttk.Button(self, text='Добавить задание',
+                                             command=self.open_task_multi_following)
         self.button_add_task.grid(row=1, column=1, sticky="nesw")
         self.button_del_task = ttk.Button(self, text='Удалить задание')
         self.button_del_task.grid(row=2, column=1, sticky="nesw")
@@ -105,6 +106,9 @@ class TasksManager(ttk.Frame):
     def open_add_account_window(self):
         form = add_account_window.AddAccountWindow(250, 200, self.winfo_toplevel(),
                                                    self.add_account_callback)
+
+    def open_task_multi_following(self):
+        task_multi_following.TaskMultiFollowingWindow(800, 300, self.winfo_toplevel())
 
 
 if __name__ == "__main__":
