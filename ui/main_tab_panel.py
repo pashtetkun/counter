@@ -3,7 +3,7 @@
 
 import tkinter as tk
 import tkinter.ttk as ttk
-from ui import tasks_manager
+from ui import tasks_manager, projects_manager
 
 
 class MainTabPanel(ttk.Notebook):
@@ -21,8 +21,8 @@ class MainTabPanel(ttk.Notebook):
         ttk.Notebook.__init__(self, parent)
         self.pack()
 
-        self.projects_manager = ttk.Frame(self)
-        self.add(self.projects_manager,     text='Менеджер проектов', state="disabled")
+        self.projects_manager = projects_manager.ProjectsManager(self)
+        self.add(self.projects_manager,     text='Менеджер проектов')
 
         self.tasks_manager = tasks_manager.TasksManager(self)
         self.add(self.tasks_manager, text='Менеджер заданий ')

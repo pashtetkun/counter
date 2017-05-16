@@ -56,31 +56,31 @@ class TasksManager(ttk.Frame):
         self.button_add_account = ttk.Button(self, text='Добавить аккаунт',
                                              command=self.open_add_account_window)
         self.button_add_account.grid(row=1, column=0, sticky="nesw")
-        self.button_del_account = ttk.Button(self, text='Удалить аккаунт')
+        self.button_del_account = ttk.Button(self, text='Удалить аккаунт', state="disabled")
         self.button_del_account.grid(row=2, column=0, sticky="nesw")
 
         self.button_add_task = ttk.Button(self, text='Добавить задание',
                                              command=self.open_task_multi_following)
         self.button_add_task.grid(row=1, column=1, sticky="nesw")
-        self.button_del_task = ttk.Button(self, text='Удалить задание')
+        self.button_del_task = ttk.Button(self, text='Удалить задание', state="disabled")
         self.button_del_task.grid(row=2, column=1, sticky="nesw")
 
-        self.button_start = ttk.Button(self, text='Старт')
+        self.button_start = ttk.Button(self, text='Старт', state="disabled")
         self.button_start.grid(row=1, column=2, sticky="nesw")
-        self.button_start_all = ttk.Button(self, text='Старт все')
+        self.button_start_all = ttk.Button(self, text='Старт все', state="disabled")
         self.button_start_all.grid(row=2, column=2, sticky="nesw")
 
-        self.button_pause = ttk.Button(self, text='Пауза')
+        self.button_pause = ttk.Button(self, text='Пауза', state="disabled")
         self.button_pause.grid(row=1, column=3, sticky="nesw")
-        self.button_pause_all = ttk.Button(self, text='Пауза все')
+        self.button_pause_all = ttk.Button(self, text='Пауза все', state="disabled")
         self.button_pause_all.grid(row=2, column=3, sticky="nesw")
 
-        self.button_stop = ttk.Button(self, text='Стоп')
+        self.button_stop = ttk.Button(self, text='Стоп', state="disabled")
         self.button_stop.grid(row=1, column=4, sticky="nesw")
-        self.button_stop_all = ttk.Button(self, text='Стоп все')
+        self.button_stop_all = ttk.Button(self, text='Стоп все', state="disabled")
         self.button_stop_all.grid(row=2, column=4, sticky="nesw")
 
-        self.button_license = ttk.Button(self, text='Информация\nо лицензии')
+        self.button_license = ttk.Button(self, text='Информация\nо лицензии', state="disabled")
         self.button_license.grid(row=1, column=5, rowspan=2, sticky="ns")
 
         self.rowconfigure(0, minsize=200, weight=1)
@@ -104,7 +104,7 @@ class TasksManager(ttk.Frame):
 
 
     def open_add_account_window(self):
-        form = add_account_window.AddAccountWindow(250, 200, self.winfo_toplevel(),
+        form = add_account_window.AddAccountWindow(250, 220, self.winfo_toplevel(),
                                                    self.add_account_callback)
 
     def open_task_multi_following(self):
@@ -114,7 +114,7 @@ class TasksManager(ttk.Frame):
 if __name__ == "__main__":
     root = tk.ThemedTk()
     print(root.get_themes())  # Returns a list of all themes that can be set
-    root.set_theme("radiance")
+    root.set_theme("vista")
     dbmanager.initialize()
     projects_manager = TasksManager(root);
     root.mainloop()
