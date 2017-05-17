@@ -11,6 +11,7 @@ ext_modules = [
     Extension("ui.mainTabPanel", ["ui/main_tab_panel.py"]),
     Extension("ui.tasksManager", ["ui/tasks_manager.py"]),
     Extension("ui.projectsManager", ["ui/projects_manager.py"]),
+    Extension("ui.licenseWindow", ["ui/license_window.py"]),
     Extension("models", ["models/__init__.py"]),
     Extension("dbmanager.dbmanager", ["dbmanager/dbmanager.py"]),
     ]

@@ -3,7 +3,7 @@
 
 import tkinter.ttk as ttk
 from ttkthemes import themed_tk as tk
-from ui import add_account_window, task_multi_following
+from ui import add_account_window, task_multi_following, license_window
 from dbmanager import dbmanager
 
 
@@ -80,7 +80,8 @@ class TasksManager(ttk.Frame):
         self.button_stop_all = ttk.Button(self, text='Стоп все', state="disabled")
         self.button_stop_all.grid(row=2, column=4, sticky="nesw")
 
-        self.button_license = ttk.Button(self, text='Информация\nо лицензии', state="disabled")
+        self.button_license = ttk.Button(self, text='Информация\nо лицензии',
+                                         command=self.open_license_window)
         self.button_license.grid(row=1, column=5, rowspan=2, sticky="ns")
 
         self.rowconfigure(0, minsize=200, weight=1)
@@ -110,6 +111,9 @@ class TasksManager(ttk.Frame):
     def open_task_multi_following(self):
         task_multi_following.TaskMultiFollowingWindow(800, 300, self.winfo_toplevel())
 
+
+    def open_license_window(self):
+        license_window.LicenseWindow(400, 300)
 
 if __name__ == "__main__":
     root = tk.ThemedTk()

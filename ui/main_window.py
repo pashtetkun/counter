@@ -8,6 +8,7 @@ class MainWindow:
     def __init__(self, width, height):
         self.root = tk.ThemedTk()
         self.root.set_theme("vista")
+        self.root.title("Инстаграммер (прототип)")
         self.hs = self.root.winfo_screenheight()
         self.ws = self.root.winfo_screenwidth()
         self.root.geometry('%dx%d+%d+%d' % (width, height, (self.ws-width)//2, (self.hs-height)//2))

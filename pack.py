@@ -19,7 +19,8 @@ buildOptions = dict(
     include_files=['c:/Python36-32/DLLs/tcl86t.dll',
                    'c:/Python36-32/DLLs/tk86t.dll',
                    'c:/Python36-32/DLLs/sqlite3.dll',
-                   os.path.join(os.getcwd(), 'smoking.ico')]
+                   os.path.join(os.getcwd(), 'smoking.ico'),
+                   os.path.join(os.getcwd(), 'Smoking.gif')]
 )
 
 import sys
