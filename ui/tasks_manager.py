@@ -4,18 +4,19 @@
 import tkinter.ttk as ttk
 from ttkthemes import themed_tk as tk
 from ui import add_account_window, task_multi_following, license_window
-from dbmanager import dbmanager
+import dbmanager as db
 
 
 class TableTasks(ttk.Treeview):
     def __init__(self, parent):
         ttk.Treeview.__init__(self, parent)
 
-        self.columns = ("Логин", "Задание", "Статус", "Подписки", "Подписчики", "Прогресс")
+        self.columns = ("Логин", "Прокси", "Публикаций", "Подписки", "Подписчики", "Задание", "Статус",
+                        "Прогресс")
         self.configure(show="headings", selectmode="browse", columns=self.columns)
         for col in self.columns:
             self.heading(col, text=col)
-            self.column(col, width=150)
+            self.column(col, width=110)
 
     '''def add_tasks_info(self, tasks_info):
         for task_info in tasks_info:
@@ -24,10 +25,10 @@ class TableTasks(ttk.Treeview):
 
     def refresh(self):
         self.delete()
-        accounts = dbmanager.get_all_accounts()
+        accounts = db.get_all_accounts()
         for account in accounts:
             self.insert('', 'end',
-                        values=(account.login, '', '', '', '', ''))
+                        values=(account.login, '', '', account.follows, account.followers, '', '', ''))
 
 
 class TasksManager(ttk.Frame):
@@ -96,8 +97,9 @@ class TasksManager(ttk.Frame):
 
         self.table_tasks.refresh()
 
-    def add_account_callback(self, login, password):
-        if dbmanager.create_account(login, password):
+    def add_account_callback(self, refresh):
+        #if db.create_account(login, password):
+        if refresh:
             self.table_tasks.refresh()
         #self.table_tasks.add_tasks_info([{"login": login}])
         #accounts = dbmanager.get_all_accounts()
@@ -105,8 +107,7 @@ class TasksManager(ttk.Frame):
 
 
     def open_add_account_window(self):
-        form = add_account_window.AddAccountWindow(250, 220, self.winfo_toplevel(),
-                                                   self.add_account_callback)
+        form = add_account_window.AddAccountWindow(200, 250, self.add_account_callback)
 
     def open_task_multi_following(self):
         task_multi_following.TaskMultiFollowingWindow(800, 300, self.winfo_toplevel())
@@ -119,6 +120,6 @@ if __name__ == "__main__":
     root = tk.ThemedTk()
     print(root.get_themes())  # Returns a list of all themes that can be set
     root.set_theme("vista")
-    dbmanager.initialize()
+    db.initialize()
     projects_manager = TasksManager(root);
     root.mainloop()

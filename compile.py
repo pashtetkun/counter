@@ -13,7 +13,7 @@ ext_modules = [
     Extension("ui.projectsManager", ["ui/projects_manager.py"]),
     Extension("ui.licenseWindow", ["ui/license_window.py"]),
     Extension("models", ["models/__init__.py"]),
-    Extension("dbmanager.dbmanager", ["dbmanager/dbmanager.py"]),
+    Extension("dbmanager", ["dbmanager/__init__.py"]),
     ]
 
 setup(

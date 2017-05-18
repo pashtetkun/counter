@@ -19,21 +19,24 @@ class ThreadedClient(threading.Thread):
         self.password = password
 
     def run(self):
-        resp = api.do_login(self.login, self.password)
-        msg = "success"
-        if not resp.success:
-            msg = resp.message
-
-        self.queue.put(msg)
+        insta_worker = api.InstaWorker(self.login, self.password)
+        resp = insta_worker.do_login()
+        if resp.success:
+            resp2 = insta_worker.get_account_info()
+            if resp2.success:
+                self.queue.put(resp2)
+            else:
+                self.queue.put(resp)
+        else:
+            self.queue.put(resp)
 
 
 class AddAccountWindow(tk.Toplevel):
-    def __init__(self, width, height, parent, callback=None):
+    def __init__(self, width, height, callback=None):
         tk.Toplevel.__init__(self, height=height, width=width)
 
         self.title("")
-        self.transient(parent)
-        self.parent = parent
+        self.transient(self.master)
         self.grab_set()
         self.geometry('%dx%d+%d+%d'
                       % (width, height, (self.winfo_screenwidth() - width) // 2, (self.winfo_screenheight() - height) // 2))
@@ -45,30 +48,36 @@ class AddAccountWindow(tk.Toplevel):
         self.frame_account.pack(fill="x", expand=1)
 
         self.header = ttk.Label(self.frame_account, text="Добавить аккаунт")
-        self.header.grid(row=0, column=0)
+        self.header.grid(row=0, column=0, columnspan=2)
         self.label1 = ttk.Label(self.frame_account, text='Логин')
-        self.label1.grid(row=1, column=0, sticky="w")
+        self.label1.grid(row=1, column=0, sticky="w", columnspan=2)
         self.var_login = tk.StringVar()
         self.var_login.set("")
         self.var_login.trace('w', self.trace_change_entry)
         self.entry1 = ttk.Entry(self.frame_account, textvariable=self.var_login)
-        self.entry1.grid(row=2, column=0, sticky="we")
+        self.entry1.grid(row=2, column=0, sticky="we", columnspan=2)
         self.label2 = ttk.Label(self.frame_account, text='Пароль')
-        self.label2.grid(row=3, column=0, sticky="w")
+        self.label2.grid(row=3, column=0, sticky="w", columnspan=2)
         self.var_password = tk.StringVar()
         self.var_password.set("")
         self.var_password.trace('w', self.trace_change_entry)
         self.entry2 = ttk.Entry(self.frame_account, textvariable=self.var_password)
-        self.entry2.grid(row=4, column=0, sticky="ew")
-        self.button_save = ttk.Button(self.frame_account, text="Сохранить", command=self.save, state="disabled")
-        self.button_save.grid(row=5, column=0)
+        self.entry2.grid(row=4, column=0, sticky="we", columnspan=2)
+
         self.var_message = tk.StringVar()
-        self.label_message = ttk.Label(self.frame_account, textvariable=self.var_message, width=10)
-        self.label_message.grid(row=6, column=0)
+        self.label_message = ttk.Label(self.frame_account, textvariable=self.var_message, width=20)
+        self.label_message.grid(row=5, column=0, columnspan=2, sticky="ew")
         self.label_message.grid_remove()
         self.progressbar = ttk.Progressbar(self.frame_account, mode='indeterminate', orient=tk.HORIZONTAL)
-        self.progressbar.grid(row=6, column=0)
+        self.progressbar.grid(row=5, column=0, columnspan=2, sticky="ew")
         self.progressbar.grid_remove()
+
+        self.var_proxy = tk.IntVar()
+        self.check1 = ttk.Checkbutton(self.frame_account, text="Прокси", command=self.proxy_checked,
+                                      variable=self.var_proxy, state='disabled')
+        self.check1.grid(row=6, column=0, sticky="w")
+        self.button_save = ttk.Button(self.frame_account, text="Добавить", command=self.save, state="disabled")
+        self.button_save.grid(row=6, column=1)
 
         '''
         self.var_proxy = tk.IntVar()
@@ -85,7 +94,8 @@ class AddAccountWindow(tk.Toplevel):
         self.frame_account.rowconfigure(5, minsize=60, weight=1)
         self.frame_account.rowconfigure(6, minsize=10, weight=1)
         self.frame_account.rowconfigure(7, minsize=20, weight=1)
-        self.frame_account.columnconfigure(0, minsize=100, weight=1)
+        self.frame_account.columnconfigure(0, minsize=75, weight=1)
+        self.frame_account.columnconfigure(1, minsize=75, weight=1)
 
         '''
         self.frame_proxy = ttk.Frame(self.frame)
@@ -139,10 +149,15 @@ class AddAccountWindow(tk.Toplevel):
         self.thread = None
 
     def save(self):
+        self.var_message.set("")
+        if db.is_exist_account(self.var_login.get()):
+            self.label_message.grid()
+            self.var_message.set("Аккаунт уже есть в базе")
+            return
         self.button_save.configure(state='disabled')
         self.entry1.configure(state="disabled")
         self.entry2.configure(state="disabled")
-        self.progressbar.grid(row=6, column=0)
+        self.progressbar.grid(row=5, column=0)
         self.progressbar.start()
         self.thread = ThreadedClient(self.queue, self.var_login.get(), self.var_password.get())
         self.thread.start()
@@ -150,20 +165,23 @@ class AddAccountWindow(tk.Toplevel):
 
     def listen_queue(self):
         try:
-            msg = self.queue.get(0)
-            self.process_message(msg)
+            resp = self.queue.get(0)
+            self.process_message(resp)
         except queue.Empty:
             self.master.after(200, self.listen_queue)
 
-    def process_message(self, msg):
-        if msg == 'success':
+    def process_message(self, resp):
+        if resp.success:
+            follows = resp.results["follows"] if resp.results else 0
+            followers = resp.results["followers"] if resp.results else 0
+            db.create_account(self.var_login.get(), self.var_password.get(), follows, followers)
             if self.callback:
-                self.callback(self.var_login.get(), self.var_password.get())
+                self.callback(True)
             self.destroy()
         else:
             self.progressbar.stop()
             self.progressbar.grid_remove()
-            self.var_message.set(msg)
+            self.var_message.set(resp.message)
             self.label_message.grid()
             self.entry1.configure(state="active")
             self.entry2.configure(state="active")
@@ -200,5 +218,6 @@ if __name__ == "__main__":
     hs = root.winfo_screenheight()
     ws = root.winfo_screenwidth()
     root.geometry('%dx%d+%d+%d' % (width, height, (ws - width) // 2, (hs - height) // 2))
-    add_account_window = AddAccountWindow(180, 220, root)
+    db.initialize()
+    add_account_window = AddAccountWindow(200, 250)
     root.mainloop()

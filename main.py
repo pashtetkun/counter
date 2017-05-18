@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from ui import main_window
-import dbmanager.dbmanager as db
+import dbmanager as db
 
 
 if __name__ == "__main__":

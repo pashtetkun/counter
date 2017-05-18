@@ -13,7 +13,6 @@ buildOptions = dict(
     packages = ["tkinter","peewee","ttkthemes"],
     excludes = [],
     includes = ["dbmanager",
-                "dbmanager.dbmanager",
                 "models",
                 "instagramapi"],
     include_files=['c:/Python36-32/DLLs/tcl86t.dll',
