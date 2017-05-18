@@ -9,6 +9,7 @@ db = pw.SqliteDatabase('data.db')
 class Account(pw.Model):
     login = pw.CharField(unique=True)
     password = pw.CharField()
+    user_id = pw.CharField()
     follows = pw.IntegerField()
     followers = pw.IntegerField()
 

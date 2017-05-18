@@ -174,7 +174,8 @@ class AddAccountWindow(tk.Toplevel):
         if resp.success:
             follows = resp.results["follows"] if resp.results else 0
             followers = resp.results["followers"] if resp.results else 0
-            db.create_account(self.var_login.get(), self.var_password.get(), follows, followers)
+            user_id = resp.results["user_id"] if resp.results else ''
+            db.create_account(self.var_login.get(), self.var_password.get(), user_id, follows, followers)
             if self.callback:
                 self.callback(True)
             self.destroy()

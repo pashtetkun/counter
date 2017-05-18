@@ -28,10 +28,14 @@ class InstaWorker:
                   "(KHTML, like Gecko) Chrome/48.0.2564.103 Safari/537.36")
     ACCEPT_LANGUAGE = 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
     USER_INFO_URL = 'https://www.instagram.com/%s/?__a=1'
+    FOLLOW_URL = 'https://www.instagram.com/web/friendships/%s/follow/'
 
     def __init__(self, login, password):
         self.login = login
         self.password = password
+        self.follows = 0
+        self.followers = 0
+        self.user_id = ''
 
         self.session = requests.Session()
 
@@ -89,15 +93,29 @@ class InstaWorker:
 
         return ResponseStatus(success, results, message)
 
-    def get_account_info(self):
-        url = USER_INFO_URL % self.login
+    def get_account_info(self, user_name=None):
+        url = USER_INFO_URL % (user_name if user_name else self.login)
         try:
             resp = self.session.get(url)
             user_info = json.loads(resp.text)
-            follows = user_info['user']['follows']['count']
+            self.follows = user_info['user']['follows']['count']
             #print("follows:" + str(follows))
-            followers = user_info['user']['followed_by']['count']
-            return ResponseStatus(True, {"follows": follows, "followers": followers}, "")
+            self.followers = user_info['user']['followed_by']['count']
+            self.user_id = user_info['user']['id']
+            return ResponseStatus(True, {"follows": self.follows, "followers": self.followers,
+                                         "user_id": self.user_id}, "")
+        except requests.exceptions.RequestException as e:
+            print(e)
+            return ResponseStatus(False, None, e)
+
+    def do_follow(self, user_id):
+        url = self.FOLLOW_URL % user_id
+        try:
+            resp = self.session.post(url)
+            if resp.status_code == 200:
+                print(resp)
+                self.follows += 1
+            return ResponseStatus(True, None, '')
         except requests.exceptions.RequestException as e:
             print(e)
             return ResponseStatus(False, None, e)
@@ -109,4 +127,8 @@ if __name__ == "__main__":
     answer = instaWorker.do_login()
     print(answer.success, answer.message)
     answer1 = instaWorker.get_account_info()
-    print(answer.success, answer1.results, answer.message)
+    print(answer1.success, answer1.results, answer1.message)
+    answer2 = instaWorker.get_account_info('salem.fotografy')
+    print(answer2.success, answer2.results, answer2.message)
+    answer3 = instaWorker.do_follow(answer2.results["user_id"])
+    print(answer3.success, answer3.results, answer3.message)
