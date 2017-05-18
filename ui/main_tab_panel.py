@@ -13,8 +13,8 @@ class MainTabPanel(ttk.Notebook):
         print(self.style.theme_names())
 
         self.style.theme_settings(self.style.theme_use(), {
-            "TNotebook": {"configure": {"tabmargins": [2, 5, 2, 0]}},
-            "TNotebook.Tab": {"configure": {"padding": [50, 50]}, "minwidth": 200}})
+            "TNotebook": {"configure": {"tabmargins": [5, 5, 5, 5]}},
+            "TNotebook.Tab": {"configure": {"padding": [30, 30]}, "minwidth": 100}})
         #self.style.theme_use("default")
         #self.style.configure('MainTab.TNotebook.Tab', minwidth=200)
 
