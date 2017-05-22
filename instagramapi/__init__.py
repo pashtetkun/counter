@@ -30,6 +30,7 @@ class InstaWorker:
     USER_INFO_URL = 'https://www.instagram.com/%s/?__a=1'
     FOLLOW_URL = 'https://www.instagram.com/web/friendships/%s/follow/'
     FOLLOWINGS_URL = 'https://www.instagram.com/%s/following/?_a=1'
+    QUERY_URL = 'https://www.instagram.com/graphql/query/?query_id=17874545323001329&id=%s&first=20'
 
     def __init__(self, login, password):
         self.login = login
@@ -121,16 +122,18 @@ class InstaWorker:
             print(e)
             return ResponseStatus(False, None, e)
 
-    def get_followings(self):
-        url = self.FOLLOWINGS_URL % self.login
+    def get_followings(self, user_id):
+        url = self.QUERY_URL % user_id
         print(url)
         try:
             resp = self.session.get(url)
-            t = json.loads(resp.text)
-            print(t)
+            followings = json.loads(resp.text)
+            print(followings)
             if resp.status_code == 200:
-                print(resp)
-                print(resp.text)
+                edges = followings["data"]["user"]["edge_follow"]["edges"]
+                print(edges)
+                for edge in edges:
+                    print(edge["node"]["username"])
         except requests.exceptions.RequestException as e:
             print(e)
 
@@ -140,12 +143,15 @@ if __name__ == "__main__":
     instaWorker = InstaWorker("ptsibizov", "animes12")
     answer = instaWorker.do_login()
     print(answer.success, answer.message)
-    '''
+
     answer1 = instaWorker.get_account_info()
     print(answer1.success, answer1.results, answer1.message)
+    '''
     answer2 = instaWorker.get_account_info('salem.fotografy')
     print(answer2.success, answer2.results, answer2.message)
     answer3 = instaWorker.do_follow(answer2.results["user_id"])
     print(answer3.success, answer3.results, answer3.message)
     '''
-    instaWorker.get_followings()
+    user_id = answer1.results["user_id"]
+
+    instaWorker.get_followings(user_id)
