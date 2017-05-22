@@ -29,6 +29,7 @@ class InstaWorker:
     ACCEPT_LANGUAGE = 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
     USER_INFO_URL = 'https://www.instagram.com/%s/?__a=1'
     FOLLOW_URL = 'https://www.instagram.com/web/friendships/%s/follow/'
+    FOLLOWINGS_URL = 'https://www.instagram.com/%s/following/?_a=1'
 
     def __init__(self, login, password):
         self.login = login
@@ -120,15 +121,31 @@ class InstaWorker:
             print(e)
             return ResponseStatus(False, None, e)
 
+    def get_followings(self):
+        url = self.FOLLOWINGS_URL % self.login
+        print(url)
+        try:
+            resp = self.session.get(url)
+            t = json.loads(resp.text)
+            print(t)
+            if resp.status_code == 200:
+                print(resp)
+                print(resp.text)
+        except requests.exceptions.RequestException as e:
+            print(e)
+
 
 if __name__ == "__main__":
     #csrftoken = get_csrf_token()
     instaWorker = InstaWorker("ptsibizov", "animes12")
     answer = instaWorker.do_login()
     print(answer.success, answer.message)
+    '''
     answer1 = instaWorker.get_account_info()
     print(answer1.success, answer1.results, answer1.message)
     answer2 = instaWorker.get_account_info('salem.fotografy')
     print(answer2.success, answer2.results, answer2.message)
     answer3 = instaWorker.do_follow(answer2.results["user_id"])
     print(answer3.success, answer3.results, answer3.message)
+    '''
+    instaWorker.get_followings()
