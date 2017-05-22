@@ -12,23 +12,27 @@ import dbmanager as db
 
 class ThreadedClient(threading.Thread):
 
-    def __init__(self, queue, login, password):
+    def __init__(self, queue, login, password, isTest=False):
         threading.Thread.__init__(self)
         self.queue = queue
         self.login = login
         self.password = password
+        self.isTest = isTest
 
     def run(self):
-        insta_worker = api.InstaWorker(self.login, self.password)
-        resp = insta_worker.do_login()
-        if resp.success:
-            resp2 = insta_worker.get_account_info()
-            if resp2.success:
-                self.queue.put(resp2)
+        if not self.isTest:
+            insta_worker = api.InstaWorker(self.login, self.password)
+            resp = insta_worker.do_login()
+            if resp.success:
+                resp2 = insta_worker.get_account_info()
+                if resp2.success:
+                    self.queue.put(resp2)
+                else:
+                    self.queue.put(resp)
             else:
                 self.queue.put(resp)
         else:
-            self.queue.put(resp)
+            self.queue.put(api.ResponseStatus(True, None, ''))
 
 
 class AddAccountWindow(tk.Toplevel):
@@ -152,7 +156,7 @@ class AddAccountWindow(tk.Toplevel):
         self.entry2.configure(state="disabled")
         self.progressbar.grid(row=0, column=0)
         self.progressbar.start()
-        self.thread = ThreadedClient(self.queue, self.var_login.get(), self.var_password.get())
+        self.thread = ThreadedClient(self.queue, self.var_login.get(), self.var_password.get(), True)
         self.thread.start()
         self.master.after(200, self.listen_queue)
 
