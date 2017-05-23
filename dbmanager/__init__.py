@@ -4,13 +4,13 @@
 import peewee as pw
 import models
 
-db = pw.SqliteDatabase('data.db')
+db = pw.SqliteDatabase('data.db', pragmas=(('foreign_keys', 'on'),))
 
 
 def initialize():
     db.connect()
-    models.Account.create_table(True)
     models.Project.create_table(True)
+    models.Account.create_table(True)
     models.TaskFollowing.create_table(True)
 
 
@@ -29,6 +29,11 @@ def is_exist_account(login):
     return True if result.exists() else False
 
 
+def delete_account(login):
+    q = models.Account.delete().where(models.Account.login == login)
+    q.execute()
+
+
 def get_all_accounts():
     return list(models.Account.select())
 
@@ -36,6 +41,7 @@ def get_all_accounts():
 def create_project(name):
     project = models.Project(name=name)
     project.save()
+    return project
 
 
 def get_all_projects():

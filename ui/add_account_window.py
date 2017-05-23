@@ -24,10 +24,10 @@ class ThreadedClient(threading.Thread):
             insta_worker = api.InstaWorker(self.login, self.password)
             resp = insta_worker.do_login()
             if resp.success:
-                resp2 = insta_worker.get_account_info()
-                if resp2.success:
-                    self.queue.put(resp2)
-                else:
+                #resp2 = insta_worker.get_account_info()
+                #if resp2.success:
+                    #self.queue.put(resp2)
+                #else:
                     self.queue.put(resp)
             else:
                 self.queue.put(resp)
@@ -169,12 +169,12 @@ class AddAccountWindow(tk.Toplevel):
 
     def process_message(self, resp):
         if resp.success:
-            follows = resp.results["follows"] if resp.results else 0
-            followers = resp.results["followers"] if resp.results else 0
-            user_id = resp.results["user_id"] if resp.results else ''
-            db.create_account(self.var_login.get(), self.var_password.get(), user_id, follows, followers)
+            #follows = resp.results["follows"] if resp.results else 0
+            #followers = resp.results["followers"] if resp.results else 0
+            #user_id = resp.results["user_id"] if resp.results else ''
+            #db.create_account(self.var_login.get(), self.var_password.get(), user_id, follows, followers)
             if self.callback:
-                self.callback(True)
+                self.callback(login=self.var_login.get(), password=self.var_password.get())
             self.destroy()
         else:
             self.progressbar.stop()

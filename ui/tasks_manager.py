@@ -23,11 +23,15 @@ class TableTasks(ttk.Treeview):
             self.insert('', 'end',
                         values=(task_info["login"], '', '', '', '', ''))'''
 
+    def clear(self):
+        for row in self.get_children():
+            self.delete(row)
+
     def refresh(self):
-        self.delete()
+        self.clear()
         accounts = db.get_all_accounts()
         for account in accounts:
-            self.insert('', 'end',
+            self.insert('', 'end', iid=account.login,
                         values=(account.login, '', '', account.follows, account.followers, '', '', ''))
 
 
@@ -97,10 +101,10 @@ class TasksManager(ttk.Frame):
 
         self.table_tasks.refresh()
 
-    def add_account_callback(self, refresh):
+    def add_account_callback(self, login=None):
         #if db.create_account(login, password):
-        if refresh:
-            self.table_tasks.refresh()
+        if login:
+            self.table_tasks.refresh(login)
         #self.table_tasks.add_tasks_info([{"login": login}])
         #accounts = dbmanager.get_all_accounts()
 

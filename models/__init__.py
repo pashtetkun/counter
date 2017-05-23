@@ -6,8 +6,17 @@ import peewee as pw
 db = pw.SqliteDatabase('data.db')
 
 
-class Account(pw.Model):
-    project_id = pw.IntegerField(null=True)
+class BaseModel(pw.Model):
+    class Meta:
+        database = db # This model uses the "people.db" database.
+
+
+class Project(BaseModel):
+    name = pw.CharField(unique=True)
+
+
+class Account(BaseModel):
+    project = pw.ForeignKeyField(Project, related_name='accounts', null=True)
     login = pw.CharField(unique=True)
     password = pw.CharField()
     user_id = pw.CharField()
@@ -20,11 +29,8 @@ class Account(pw.Model):
     proxy_login = pw.CharField(null=True)
     proxy_password = pw.CharField(null=True)
 
-    class Meta:
-        database = db # This model uses the "people.db" database.
 
-
-class TaskFollowing(pw.Model):
+class TaskFollowing(BaseModel):
     path = pw.CharField()
     delay_from = pw.IntegerField()
     delay_to = pw.IntegerField()
@@ -41,13 +47,3 @@ class TaskFollowing(pw.Model):
     login = pw.CharField(unique=True)
     count_all = pw.IntegerField()
     count_done = pw.IntegerField()
-
-    class Meta:
-        database = db # This model uses the "people.db" database.
-
-
-class Project(pw.Model):
-    name = pw.CharField(unique=True)
-
-    class Meta:
-        database = db # This model uses the "people.db" database.
