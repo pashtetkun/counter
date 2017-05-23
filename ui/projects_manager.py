@@ -3,6 +3,7 @@
 
 import tkinter.ttk as ttk
 from ttkthemes import themed_tk as tk
+import tkinter as tk
 from ui import add_account_window
 import dbmanager as db
 
@@ -18,13 +19,19 @@ class TableProjects(ttk.Treeview):
             self.column(col, width=100)
         self.projects = []
 
-    def refresh(self):
-        self.delete()
+    def clear(self):
+        for row in self.get_children():
+            self.delete(row)
+
+    def refresh(self, selected=None):
+        self.clear()
         projects = db.get_all_projects()
         for project in projects:
-            self.insert('', 'end',
+            self.insert('', 'end', iid=project.name,
                         values=(project.name, ))
         self.projects = projects
+        if selected:
+            self.selection_set(selected)
 
 
 class TableAccounts(ttk.Treeview):
@@ -54,7 +61,8 @@ class ProjectsManager(ttk.Frame):
         self.button_add_project = ttk.Button(self, text='Добавить проект', command=self.add_project_click)
         self.button_add_project.grid(row=8, column=0, sticky="nesw")
 
-        self.entry0 = ttk.Entry(self, state="disabled")
+        self.var_name = tk.StringVar()
+        self.entry0 = ttk.Entry(self, textvariable=self.var_name, state="disabled")
         self.entry0.grid(row=0, column=1, sticky="ew", padx=5, pady=10)
         self.table_accounts = TableAccounts(self)
         self.table_accounts.grid(row=1, column=1, rowspan=5, sticky="ew", padx=5, pady=10)
@@ -68,7 +76,8 @@ class ProjectsManager(ttk.Frame):
 
         self.label1 = ttk.Label(self, text="Загрузить аккаунты из списка")
         self.label1.grid(row=1, column=2, columnspan=2, sticky="ws")
-        self.entry1 = ttk.Entry(self, state="disabled")
+        self.var_path = tk.StringVar()
+        self.entry1 = ttk.Entry(self, textvariable=self.var_path, state="disabled")
         self.entry1.grid(row=2, column=2, columnspan=2, sticky="ew")
         self.button_load = ttk.Button(self, text="Загрузить", state="disabled")
         self.button_load.grid(row=2, column=4)
@@ -79,7 +88,7 @@ class ProjectsManager(ttk.Frame):
         self.button_choose = ttk.Button(self, text="Выбрать", state="disabled")
         self.button_choose.grid(row=4, column=4)
 
-        self.button_save = ttk.Button(self, text="Сохранить", state="disabled")
+        self.button_save = ttk.Button(self, text="Сохранить", command=self.save_click)
         self.button_save.grid(row=6, column=3, rowspan=2, columnspan=3, sticky="ewns")
 
         self.rowconfigure(0, minsize=20, weight=1)
@@ -111,8 +120,8 @@ class ProjectsManager(ttk.Frame):
         add_account_window.AddAccountWindow(200, 250, self.add_account_callback)
 
     def add_project_click(self):
-        self.button_add_project.configure(state='disabled')
 
+        self.clear_values()
         self.entry0.configure(state='active')
         self.entry1.configure(state='active')
         self.button_add_account.configure(state='active')
@@ -121,6 +130,18 @@ class ProjectsManager(ttk.Frame):
         self.button_choose.configure(state='active')
         self.button_save.configure(state='active')
 
+    def clear_values(self):
+        self.var_name.set("")
+        self.var_path.set("")
+
+    def show_values(self, project_name):
+        pass
+
+
+    def save_click(self):
+        name = self.var_name.get()
+        db.create_project(name)
+        self.table_projects.refresh(name)
 
 
 if __name__ == "__main__":
