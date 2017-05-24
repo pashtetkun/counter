@@ -44,8 +44,17 @@ def create_project(name):
     return project
 
 
+def update_project(project):
+    project.save()
+
+
+def delete_project(name):
+    q = models.Project.delete().where(models.Project.name == name)
+    q.execute()
+
+
 def get_all_projects():
-    return list(models.Project.select())
+    return list(models.Project.select().order_by(models.Project.name))
 
 
 def is_exist_project(name):
