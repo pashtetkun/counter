@@ -75,7 +75,7 @@ class ProjectsManager(ttk.Frame):
 
         self.table_projects = TableProjects(self)
         self.table_projects.grid(row=0, column=0, rowspan=8, sticky="ewns", padx=5, pady=10)
-        self.table_projects.bind('<<TreeviewSelect>>', self.select_project)
+        self.table_projects.bind('<<TreeviewSelect>>', self.select_project_handler)
         self.button_add_project = ttk.Button(self, text='Добавить проект', command=self.add_project_click)
         self.button_add_project.grid(row=8, column=0, sticky="nesw")
 
@@ -198,7 +198,7 @@ class ProjectsManager(ttk.Frame):
             if next((x for x in self.table_projects.projects if x.name == name), None):
                 return False
         else:
-            id = self.table_projects.current_project
+            id = self.table_projects.current_project.id
             if next((x for x in self.table_projects.projects if x.name == name and x.id != id), None):
                 return False
         return True
@@ -209,20 +209,23 @@ class ProjectsManager(ttk.Frame):
         if sel:
             self.button_delete_account.configure(state='active')
 
-    def select_project(self, e):
+    def select_project_handler(self, e):
         sel = e.widget.selection()
         if sel:
-            self.is_new = False
             name = sel[0]
-            self.var_name.set(name)
-            self.entry0.configure(state='active')
-            self.entry1.configure(state='active')
-            self.button_choose.configure(state='active')
-            self.button_load.configure(state='active')
-            self.cmb1.configure(state='active')
-            self.button_add_account.configure(state='active')
-            self.button_delete_project.configure(state='active')
-            self.table_projects.set_current_project(name)
+            self.select_project(name)
+
+    def select_project(self, name):
+        self.is_new = False
+        self.var_name.set(name)
+        self.entry0.configure(state='active')
+        self.entry1.configure(state='active')
+        self.button_choose.configure(state='active')
+        self.button_load.configure(state='active')
+        self.cmb1.configure(state='active')
+        self.button_add_account.configure(state='active')
+        self.button_delete_project.configure(state='active')
+        self.table_projects.set_current_project(name)
 
     def delete_project_click(self):
         project = self.table_projects.current_project
