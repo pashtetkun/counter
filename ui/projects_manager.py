@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import tkinter.ttk as ttk
-from ttkthemes import themed_tk as tk
+from ttkthemes import themed_tk as thk
 import tkinter as tk
 import tkinter.messagebox as tmb
-from ui import add_account_window
+from ui import add_account_window, table_projects
 import dbmanager as db
-from models import Project
 
-
+'''
 class TableProjects(ttk.Treeview):
     def __init__(self, parent):
         ttk.Treeview.__init__(self, parent)
@@ -41,6 +40,8 @@ class TableProjects(ttk.Treeview):
 
     def set_current_project(self, name):
         self.current_project = next((x for x in self.projects if x.name == name), None)
+        return self.current_project
+'''
 
 
 class TableAccounts(ttk.Treeview):
@@ -52,20 +53,43 @@ class TableAccounts(ttk.Treeview):
         for col in self.columns:
             self.heading(col, text=col)
         self.accounts = []
+        self.current_account = None
+        self.deleted_accounts = []
 
     def clear(self):
         for row in self.get_children():
             self.delete(row)
 
+    def initialize(self, project_id):
+        self.accounts = db.get_accounts_for_project(project_id)
+        self.refresh()
+
     def refresh(self, selected=None):
         self.clear()
-        accounts = db.get_all_accounts()
-        for account in accounts:
+        for account in self.accounts:
             self.insert('', 'end', iid=account.login,
                         values=(account.login, ))
-        self.accounts = accounts
         if selected:
             self.selection_set(selected)
+            self.set_current_account(selected)
+        else:
+            self.current_account = None
+
+    def add_account(self, account):
+        if not next((x for x in self.accounts if x.login == account.login), None):
+            self.accounts.append(account)
+            self.accounts.sort(key=lambda x: x.login)
+            self.refresh(account.login)
+
+    def delete_account(self, account):
+        if account.id:
+            self.deleted_accounts.append(account)
+        self.accounts.remove(account)
+        self.refresh()
+
+    def set_current_account(self, login):
+        self.current_account = next((x for x in self.accounts if x.login == login), None)
+        return self.current_account
 
 
 class ProjectsManager(ttk.Frame):
@@ -73,7 +97,8 @@ class ProjectsManager(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.pack()
 
-        self.table_projects = TableProjects(self)
+        #self.table_projects = TableProjects(self)
+        self.table_projects = table_projects.TableProjects(self)
         self.table_projects.grid(row=0, column=0, rowspan=8, sticky="ewns", padx=5, pady=10)
         self.table_projects.bind('<<TreeviewSelect>>', self.select_project_handler)
         self.button_add_project = ttk.Button(self, text='Добавить проект', command=self.add_project_click)
@@ -85,7 +110,7 @@ class ProjectsManager(ttk.Frame):
         self.entry0.grid(row=0, column=1, sticky="ew", padx=5, pady=10)
         self.table_accounts = TableAccounts(self)
         self.table_accounts.grid(row=1, column=1, rowspan=5, sticky="ew", padx=5, pady=10)
-        self.table_accounts.bind('<<TreeviewSelect>>', self.select_account)
+        self.table_accounts.bind('<<TreeviewSelect>>', self.select_account_handler)
         self.button_add_account = ttk.Button(self, text='Добавить аккаунт', state='disabled',
                                              command=self.open_account_window)
         self.button_add_account.grid(row=6, column=1, sticky="ew", padx=5, pady=10)
@@ -141,12 +166,12 @@ class ProjectsManager(ttk.Frame):
 
         self.is_new = False
 
-    def add_account_callback(self, **kwargs):
-        login = kwargs["login"]
-        password = kwargs["password"]
-        if login:
-            db.create_account(login, password, '0', 0, 0)
-            self.table_accounts.refresh(login)
+    def add_account_callback(self, account):
+        #account = kwargs["account"]
+        #password = kwargs["password"]
+        if account:
+            #db.create_account(login, password, '0', 0, 0)
+            self.table_accounts.add_account(account)
 
     def open_account_window(self):
         add_account_window.AddAccountWindow(200, 250, self.add_account_callback)
@@ -170,6 +195,7 @@ class ProjectsManager(ttk.Frame):
     def clear_values(self):
         self.var_name.set("")
         self.var_path.set("")
+        self.table_accounts.clear()
 
     def show_values(self, project_name):
         #self.var_name.set(project_name)
@@ -180,16 +206,24 @@ class ProjectsManager(ttk.Frame):
             self.var_message.set('need unique name')
             return
         name = self.var_name.get()
+        project = None
         if self.is_new:
             project = db.create_project(name)
-            accounts = self.table_accounts.get_children()
-            for account in accounts:
-                db.create_account(accounts)
-            self.table_projects.refresh(name)
         else:
             project = self.table_projects.current_project
             project.name = self.var_name.get()
             db.update_project(project)
+
+        accounts = self.table_accounts.accounts
+        for account in accounts:
+            if not account.project:
+                account.project = project
+            db.create_account(account)
+
+        deleted_accounts = self.table_accounts.deleted_accounts
+        for account in deleted_accounts:
+            db.delete_account(account.login)
+
         self.table_projects.refresh(name)
 
     def check_name(self):
@@ -203,11 +237,15 @@ class ProjectsManager(ttk.Frame):
                 return False
         return True
 
-
-    def select_account(self, e):
+    def select_account_handler(self, e):
         sel = e.widget.selection()
         if sel:
-            self.button_delete_account.configure(state='active')
+            login = sel[0]
+            self.select_account(login)
+
+    def select_account(self, login):
+        self.button_delete_account.configure(state='active')
+        self.table_accounts.set_current_account(login)
 
     def select_project_handler(self, e):
         sel = e.widget.selection()
@@ -225,30 +263,45 @@ class ProjectsManager(ttk.Frame):
         self.cmb1.configure(state='active')
         self.button_add_account.configure(state='active')
         self.button_delete_project.configure(state='active')
-        self.table_projects.set_current_project(name)
+        current_project = self.table_projects.set_current_project(name)
+        self.table_accounts.initialize(current_project.id)
+        if not self.table_accounts.accounts:
+            self.button_delete_account.configure(state='disabled')
+        else:
+            self.button_delete_account.configure(state='active')
 
     def delete_project_click(self):
         project = self.table_projects.current_project
         if tmb.askquestion(title="", message="Удалить проект '%s'?" % project.name) == 'yes':
+            prev_name = self.table_projects.prev(project.name)
+            next_name = self.table_projects.next(project.name)
             db.delete_project(project.name)
-            self.table_projects.refresh()
+            name = prev_name if prev_name else next_name
+            self.table_projects.refresh(name)
             if self.table_projects.projects:
                 self.button_delete_project.configure(state='active')
             else:
                 self.button_delete_project.configure(state='disabled')
-            self.clear_values()
+                self.clear_values()
+                self.entry0.configure(state='disabled')
+                self.entry1.configure(state='disabled')
+                self.button_choose.configure(state='disabled')
+                self.button_load.configure(state='disabled')
+                self.cmb1.configure(state='disabled')
+                self.button_add_account.configure(state='disabled')
+                self.button_delete_project.configure(state='disabled')
 
     def delete_account_click(self):
-        sel = self.table_accounts.selection()
-        login = sel[0]
-        if tmb.askquestion(title="", message="Удалить %s?" % login) == 'yes':
-            db.delete_account(login)
-            self.table_accounts.refresh()
+        account = self.table_accounts.current_account
+        if tmb.askquestion(title="", message="Удалить %s?" % account.login) == 'yes':
+            #db.delete_account(account.login)
+            self.table_accounts.delete_account(account)
+            #self.table_accounts.refresh()
             self.button_delete_account.configure(state='disabled')
             if self.table_accounts.accounts:
-                self.button_save.configure(state='active')
+                self.button_delete_account.configure(state='active')
             else:
-                self.button_save.configure(state='disabled')
+                self.button_delete_account.configure(state='disabled')
 
     def trace_change_name(self, a, b, c):
         self.var_message.set("")
@@ -259,7 +312,8 @@ class ProjectsManager(ttk.Frame):
 
 
 if __name__ == "__main__":
-    root = tk.ThemedTk()
+    db.initialize()
+    root = thk.ThemedTk()
     print(root.get_themes())  # Returns a list of all themes that can be set
     root.set_theme("vista")
     projects_manager = ProjectsManager(root);

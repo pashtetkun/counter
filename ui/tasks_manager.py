@@ -3,7 +3,7 @@
 
 import tkinter.ttk as ttk
 from ttkthemes import themed_tk as tk
-from ui import add_account_window, task_multi_following, license_window
+from ui import add_account_window, task_multi_following, license_window, table_projects
 import dbmanager as db
 
 
@@ -40,6 +40,7 @@ class TasksManager(ttk.Frame):
         ttk.Frame.__init__(self, parent)
         self.pack()
 
+        '''
         self.table1_columns = ("Проекты",)
         self.table1 = ttk.Treeview(self, show="headings", selectmode="browse",
                                    columns=self.table1_columns)
@@ -47,13 +48,10 @@ class TasksManager(ttk.Frame):
             self.table1.heading(col, text=col)
 
         self.table1.grid(row=0, column=0)
+        '''
+        self.table_projects = table_projects.TableProjects(self)
+        self.table_projects.grid(row=0, column=0, sticky='ew')
 
-        '''self.table2_columns = ("Логин", "Задание", "Статус", "Подписки", "Подписчики", "Прогресс")
-        self.table2 = ttk.Treeview(self, show="headings", selectmode="browse",
-                                  columns=self.table2_columns)
-        for col in self.table2_columns:
-            self.table2.heading(col, text=col)
-            self.table2.column(col, width=150)'''
         self.table_tasks = TableTasks(self)
 
         self.table_tasks.grid(row=0, column=1, columnspan=5)
@@ -99,6 +97,7 @@ class TasksManager(ttk.Frame):
         self.columnconfigure(4, minsize=100, weight=1)
         self.columnconfigure(5, minsize=100, weight=1)
 
+        self.table_projects.refresh()
         self.table_tasks.refresh()
 
     def add_account_callback(self, login=None):

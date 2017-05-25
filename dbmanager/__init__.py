@@ -14,12 +14,10 @@ def initialize():
     models.TaskFollowing.create_table(True)
 
 
-def create_account(login, password, user_id, follows, followers):
+def create_account(account):
     result = False
-    if not is_exist_account(login):
-        acc = models.Account(login=login, password=password,
-                             user_id=user_id, follows=follows, followers=followers)
-        acc.save()
+    if not is_exist_account(account.login):
+        account.save()
         result = True
     return result
 
@@ -37,6 +35,9 @@ def delete_account(login):
 def get_all_accounts():
     return list(models.Account.select())
 
+
+def get_accounts_for_project(project_id):
+    return list(models.Account.select().where(models.Account.project == project_id).order_by(models.Account.login))
 
 def create_project(name):
     project = models.Project(name=name)

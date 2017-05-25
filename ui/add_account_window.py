@@ -8,6 +8,7 @@ import instagramapi as api
 import threading
 import queue
 import dbmanager as db
+from models import Account
 
 
 class ThreadedClient(threading.Thread):
@@ -174,7 +175,8 @@ class AddAccountWindow(tk.Toplevel):
             #user_id = resp.results["user_id"] if resp.results else ''
             #db.create_account(self.var_login.get(), self.var_password.get(), user_id, follows, followers)
             if self.callback:
-                self.callback(login=self.var_login.get(), password=self.var_password.get())
+                account = Account(login=self.var_login.get(), password=self.var_password.get())
+                self.callback(account)
             self.destroy()
         else:
             self.progressbar.stop()
