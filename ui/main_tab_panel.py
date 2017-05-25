@@ -4,6 +4,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from ui import tasks_manager, projects_manager
+import dbmanager as db
 
 
 class MainTabPanel(ttk.Notebook):
@@ -13,8 +14,8 @@ class MainTabPanel(ttk.Notebook):
         print(self.style.theme_names())
 
         self.style.theme_settings(self.style.theme_use(), {
-            "TNotebook": {"configure": {"tabmargins": [5, 5, 5, 5]}},
-            "TNotebook.Tab": {"configure": {"padding": [30, 30]}, "minwidth": 100}})
+            "TNotebook": {"configure": {"tabmargins": [0, 5, 0, 5]}},
+            "TNotebook.Tab": {"configure": {"padding": [30, 50, 30, 50]}, "minwidth": 100}})
         #self.style.theme_use("default")
         #self.style.configure('MainTab.TNotebook.Tab', minwidth=200)
 
@@ -40,6 +41,7 @@ class MainTabPanel(ttk.Notebook):
 
 
 if __name__ == "__main__":
+    db.initialize()
     root = tk.Tk()
     width = 1000
     height = 500
