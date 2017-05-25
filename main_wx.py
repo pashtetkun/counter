@@ -2,12 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import wx
-import dbmanager as db
-
+from ui_wx import main_window
 
 if __name__ == "__main__":
-    db.initialize()
-    app = wx.App()
-    wnd = wx.Frame(None, wx.ID_ANY, "main window")
-    wnd.Show(True)
-    app.MainLoop()
+    main_window.MainWindow(100, 100)

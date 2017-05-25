@@ -8,14 +8,10 @@ from cx_Freeze import setup, Executable
 # Dependencies are automatically detected, but it might need
 # fine tuning.
 buildOptions = dict(
-    packages = ["peewee","wx"],
+    packages = ["wx"],
     excludes = [],
-    includes = ["dbmanager",
-                "models",
-                "instagramapi"],
-    include_files=['c:/Python36-32/DLLs/sqlite3.dll',
-                   os.path.join(os.getcwd(), 'smoking.ico'),
-                   os.path.join(os.getcwd(), 'Smoking.gif')]
+    includes = [],
+    include_files=[]
 )
 
 import sys

@@ -1,4 +1,5 @@
-# coding=utf-8
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 from ui.main_tab_panel import MainTabPanel
 from ttkthemes import themed_tk as tk
