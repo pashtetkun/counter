@@ -39,6 +39,17 @@ class MainTabPanel(ttk.Notebook):
 
         self.select(1)
 
+        self.bind('<<NotebookTabChanged>>', self.tab_changed_handler)
+
+    def tab_changed_handler(self, event):
+        #print(event.widget.select('current'))
+        index = event.widget.index('current')
+        if index == 0:
+            self.projects_manager.unallocated_accounts_initialize()
+        if index == 1:
+            current_project = self.tasks_manager.table_projects.current_project
+            self.tasks_manager.table_projects.refresh(current_project.name)
+
 
 if __name__ == "__main__":
     db.initialize()

@@ -16,7 +16,7 @@ class Project(BaseModel):
 
 
 class Account(BaseModel):
-    project = pw.ForeignKeyField(Project, related_name='accounts', null=True)
+    project = pw.ForeignKeyField(Project, related_name='accounts', null=True, on_delete='CASCADE')
     login = pw.CharField(unique=True)
     password = pw.CharField()
     user_id = pw.CharField(null=True)

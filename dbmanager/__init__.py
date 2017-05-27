@@ -16,9 +16,9 @@ def initialize():
 
 def create_account(account):
     result = False
-    if not is_exist_account(account.login):
-        account.save()
-        result = True
+    #if not is_exist_account(account.login):
+    account.save()
+    result = True
     return result
 
 
@@ -32,12 +32,17 @@ def delete_account(login):
     q.execute()
 
 
+def update_account(account):
+    account.save()
+
+
 def get_all_accounts():
     return list(models.Account.select())
 
 
 def get_accounts_for_project(project_id):
     return list(models.Account.select().where(models.Account.project == project_id).order_by(models.Account.login))
+
 
 def create_project(name):
     project = models.Project(name=name)
@@ -50,8 +55,15 @@ def update_project(project):
 
 
 def delete_project(name):
-    q = models.Project.delete().where(models.Project.name == name)
-    q.execute()
+    #q = models.Project.delete().where(models.Project.name == name)
+    #q.execute()
+    project = get_project_by_name(name)
+    project.delete_instance(recursive=True, delete_nullable=True)
+
+
+def get_project_by_name(name):
+    project = models.Project.get(models.Project.name == name)
+    return project
 
 
 def get_all_projects():

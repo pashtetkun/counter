@@ -27,12 +27,17 @@ class TableTasks(ttk.Treeview):
         for row in self.get_children():
             self.delete(row)
 
-    def refresh(self):
+    def refresh(self, project_id):
         self.clear()
-        accounts = db.get_all_accounts()
+        #accounts = db.get_all_accounts()
+        accounts = db.get_accounts_for_project(project_id)
         for account in accounts:
             self.insert('', 'end', iid=account.login,
                         values=(account.login, '', '', account.follows, account.followers, '', '', ''))
+
+    #def initialize(self, project_id):
+    #   accounts = db.get_accounts_for_project(project_id)
+    #  self.refresh()
 
 
 class TasksManager(ttk.Frame):
@@ -49,20 +54,21 @@ class TasksManager(ttk.Frame):
 
         self.table1.grid(row=0, column=0)
         '''
-        self.table_projects = table_projects.TableProjects(self)
+        self.table_projects = table_projects.TableProjects(self, width=None, unallocated=True)
         self.table_projects.grid(row=0, column=0, sticky='ew')
+        self.table_projects.bind('<<TreeviewSelect>>', self.select_project_handler)
 
         self.table_tasks = TableTasks(self)
 
         self.table_tasks.grid(row=0, column=1, columnspan=5)
 
-        self.button_add_account = ttk.Button(self, text='Добавить аккаунт',
+        self.button_add_account = ttk.Button(self, text='Добавить аккаунт', state='disabled',
                                              command=self.open_add_account_window)
         self.button_add_account.grid(row=1, column=0, sticky="nesw")
         self.button_del_account = ttk.Button(self, text='Удалить аккаунт', state="disabled")
         self.button_del_account.grid(row=2, column=0, sticky="nesw")
 
-        self.button_add_task = ttk.Button(self, text='Добавить задание',
+        self.button_add_task = ttk.Button(self, text='Добавить задание', state='disabled',
                                              command=self.open_task_multi_following)
         self.button_add_task.grid(row=1, column=1, sticky="nesw")
         self.button_del_task = ttk.Button(self, text='Удалить задание', state="disabled")
@@ -97,17 +103,17 @@ class TasksManager(ttk.Frame):
         self.columnconfigure(4, minsize=100, weight=1)
         self.columnconfigure(5, minsize=100, weight=1)
 
-        self.table_projects.refresh()
-        self.table_tasks.refresh()
+        self.table_projects.refresh(selected='Нераспределенные аккаунты')
+        self.table_tasks.refresh(project_id=None)
 
-    def add_account_callback(self, login=None):
+    def add_account_callback(self, account):
         #if db.create_account(login, password):
-        if login:
-            self.table_tasks.refresh(login)
+        if account:
+            #self.table_tasks.refresh(login)
+            db.create_account(account)
+            self.table_projects.refresh(selected='Нераспределенные аккаунты')
         #self.table_tasks.add_tasks_info([{"login": login}])
         #accounts = dbmanager.get_all_accounts()
-
-
 
     def open_add_account_window(self):
         form = add_account_window.AddAccountWindow(200, 250, self.add_account_callback)
@@ -115,9 +121,22 @@ class TasksManager(ttk.Frame):
     def open_task_multi_following(self):
         task_multi_following.TaskMultiFollowingWindow(800, 300, self.winfo_toplevel())
 
-
     def open_license_window(self):
         license_window.LicenseWindow(400, 300)
+
+    def select_project_handler(self, e):
+        sel = e.widget.selection()
+        if sel:
+            name = sel[0]
+            self.select_project(name)
+
+    def select_project(self, name):
+        current_project = self.table_projects.set_current_project(name)
+        self.table_tasks.refresh(current_project.id)
+        if not current_project.id:
+            self.button_add_account.configure(state='active')
+        else:
+            self.button_add_account.configure(state='disabled')
 
 if __name__ == "__main__":
     root = tk.ThemedTk()

@@ -5,8 +5,10 @@ import tkinter.ttk as ttk
 from ttkthemes import themed_tk as thk
 import tkinter as tk
 import tkinter.messagebox as tmb
-from ui import add_account_window, table_projects
+import tkinter.filedialog as tfd
+from ui import add_account_window, table_projects, license_window
 import dbmanager as db
+from models import Account
 
 '''
 class TableProjects(ttk.Treeview):
@@ -81,8 +83,15 @@ class TableAccounts(ttk.Treeview):
             self.accounts.sort(key=lambda x: x.login)
             self.refresh(account.login)
 
+    def add_accounts(self, accounts):
+        for account in accounts:
+            if not next((x for x in self.accounts if x.login == account.login), None):
+                self.accounts.append(account)
+        self.accounts.sort(key=lambda x: x.login)
+        self.refresh()
+
     def delete_account(self, account):
-        if account.id:
+        if account.project:
             self.deleted_accounts.append(account)
         self.accounts.remove(account)
         self.refresh()
@@ -98,7 +107,7 @@ class ProjectsManager(ttk.Frame):
         self.pack()
 
         #self.table_projects = TableProjects(self)
-        self.table_projects = table_projects.TableProjects(self)
+        self.table_projects = table_projects.TableProjects(self, width=100)
         self.table_projects.grid(row=0, column=0, rowspan=8, sticky="ewns", padx=5, pady=10)
         self.table_projects.bind('<<TreeviewSelect>>', self.select_project_handler)
         self.button_add_project = ttk.Button(self, text='Добавить проект', command=self.add_project_click)
@@ -130,17 +139,21 @@ class ProjectsManager(ttk.Frame):
         self.var_path = tk.StringVar()
         self.entry1 = ttk.Entry(self, textvariable=self.var_path, state="disabled")
         self.entry1.grid(row=2, column=2, columnspan=2, sticky="ew")
-        self.button_load = ttk.Button(self, text="Загрузить", state="disabled")
+        self.button_load = ttk.Button(self, text="Загрузить", state="disabled", command=self.load_from_file_click)
         self.button_load.grid(row=2, column=4)
         self.label2 = ttk.Label(self, text="Выбрать из имеющихся")
         self.label2.grid(row=3, column=2, columnspan=2, sticky="ws")
-        self.cmb1 = ttk.Combobox(self, state="disabled")
+        self.var_unalloc_account = tk.StringVar()
+        self.cmb1 = ttk.Combobox(self, state="disabled", textvariable=self.var_unalloc_account)
         self.cmb1.grid(row=4, column=2, columnspan=2, sticky="ew")
-        self.button_choose = ttk.Button(self, text="Выбрать", state="disabled")
+        self.button_choose = ttk.Button(self, text="Выбрать", state="disabled", command=self.button_choose_click)
         self.button_choose.grid(row=4, column=4)
 
         self.button_save = ttk.Button(self, text="Сохранить", state='disabled', command=self.save_click)
         self.button_save.grid(row=6, column=3, rowspan=2, columnspan=3, sticky="ewns")
+
+        self.button_license = ttk.Button(self, text='Информация о лицензии', command=self.open_license_window)
+        self.button_license.grid(row=8, column=3, sticky="nesw")
 
         self.rowconfigure(0, minsize=20, weight=1)
         self.rowconfigure(1, minsize=20, weight=1)
@@ -165,6 +178,14 @@ class ProjectsManager(ttk.Frame):
             self.button_delete_project.configure(state='active')
 
         self.is_new = False
+        """
+        self.unallocated_accounts = db.get_accounts_for_project(None)
+        values = list(map(lambda x: x.login, self.unallocated_accounts))
+        values.insert(0, '')
+        self.cmb1.configure(values=values)
+        """
+        self.unallocated_accounts = []
+        self.unallocated_accounts_initialize()
 
     def add_account_callback(self, account):
         #account = kwargs["account"]
@@ -183,7 +204,7 @@ class ProjectsManager(ttk.Frame):
         self.entry1.configure(state='active')
         self.button_add_account.configure(state='active')
         self.button_load.configure(state='active')
-        self.cmb1.configure(state='active')
+        self.cmb1.configure(state='readonly')
         self.button_choose.configure(state='active')
         self.button_save.configure(state='disabled')
 
@@ -260,15 +281,16 @@ class ProjectsManager(ttk.Frame):
         self.entry1.configure(state='active')
         self.button_choose.configure(state='active')
         self.button_load.configure(state='active')
-        self.cmb1.configure(state='active')
+        self.cmb1.configure(state='readonly')
         self.button_add_account.configure(state='active')
         self.button_delete_project.configure(state='active')
         current_project = self.table_projects.set_current_project(name)
         self.table_accounts.initialize(current_project.id)
-        if not self.table_accounts.accounts:
+        if not self.table_accounts.current_account:
             self.button_delete_account.configure(state='disabled')
         else:
             self.button_delete_account.configure(state='active')
+        self.unallocated_accounts_initialize()
 
     def delete_project_click(self):
         project = self.table_projects.current_project
@@ -309,6 +331,42 @@ class ProjectsManager(ttk.Frame):
             self.button_save.configure(state="active")
         else:
             self.button_save.configure(state="disabled")
+
+    def load_from_file_click(self):
+        path = tfd.askopenfilename(defaultextension=".txt", filetypes=[("All Files", "*.*"),
+                                                                       ("Text Documents","*.txt")])
+        if not path:
+            return
+        with open(path) as infile:
+            for line in infile:
+                login, password = line.strip().split(":")
+                account = Account(login=login, password=password)
+                #db.create_account()
+                self.table_accounts.add_account(account)
+
+    def button_choose_click(self):
+        unalloc_account_name = self.var_unalloc_account.get()
+        if unalloc_account_name:
+            account = next((x for x in self.unallocated_accounts if x.login == unalloc_account_name), None)
+            if account:
+                self.unallocated_accounts.remove(account)
+                #account.project = self.table_projects.current_project
+                #db.update_account(account)
+                self.table_accounts.add_account(account)
+                self.unallocated_accounts_refresh()
+
+    def unallocated_accounts_initialize(self):
+        self.unallocated_accounts = db.get_accounts_for_project(None)
+        self.unallocated_accounts_refresh()
+
+    def unallocated_accounts_refresh(self):
+        values = list(map(lambda x: x.login, self.unallocated_accounts))
+        values.insert(0, '')
+        self.cmb1.configure(values=values)
+        self.cmb1.current(0)
+
+    def open_license_window(self):
+        license_window.LicenseWindow(400, 300)
 
 
 if __name__ == "__main__":
