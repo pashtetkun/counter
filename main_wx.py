@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import wx
-from ui_wx import main_window
+from ui_wx.main_frame import MainFrame
 
 if __name__ == "__main__":
-    main_window.MainWindow(100, 100)
+    app = wx.App()
+    frame = MainFrame(1000, 500);
+    frame.Show(True)
+    app.MainLoop()
