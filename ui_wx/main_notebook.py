@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import wx
+from ui_wx.project_manager import ProjectManager
 
 
 class MainNotebook(wx.Notebook):
     def __init__(self, parent):
         super(MainNotebook, self).__init__(parent)
-        panel0 = wx.Panel(self)
+        panel0 = ProjectManager(self)
         panel1 = wx.Panel(self)
         panel2 = wx.Panel(self)
         panel3 = wx.Panel(self)
@@ -18,7 +19,8 @@ class MainNotebook(wx.Notebook):
         self.AddPage(panel3, 'Настройки')
         self.AddPage(panel4, 'Логи')
 
-        self.SetFont(wx.Font(wx.FontInfo(20)))
+        self.SetBackgroundColour('gray')
+        self.SetFont(wx.Font(wx.FontInfo(14)))
 
 
 if __name__ == "__main__":
