@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import wx
+from ui_wx.add_account_dialog import AddAccountDialog
 
 
 class ProjectCard(wx.Panel):
@@ -18,6 +19,7 @@ class ProjectCard(wx.Panel):
         gridsizer.Add(accounts_list, pos=(1, 0), span=(4, 1))
 
         button_add_account = wx.Button(self, wx.ID_ANY, label="Добавить аккаунт")
+        self.Bind(wx.EVT_BUTTON, self.addAccountClick, button_add_account)
         gridsizer.Add(button_add_account, pos=(5,0), flag=wx.EXPAND)
 
         label_loadfromfile = wx.StaticText(self, wx.ID_ANY, "Загрузить аккаунты из списка")
@@ -40,6 +42,12 @@ class ProjectCard(wx.Panel):
 
         self.SetSizer(gridsizer)
         self.Layout()
+
+    def addAccountClick(self, event):
+        dialog = AddAccountDialog(self.Parent)
+        dialog.ShowModal()
+        dialog.Destroy()
+
 
 
 class ProjectManager(wx.Panel):
