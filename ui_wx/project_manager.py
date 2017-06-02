@@ -51,6 +51,7 @@ class ProjectManager(wx.Panel):
         gridsizer = wx.GridBagSizer(vgap=5, hgap=5)
 
         projects_list = wx.ListCtrl(self, wx.ID_ANY, style=wx.LC_REPORT, size=(200, 300))
+        projects_list.InsertColumn(0, "Проекты", width=200, format=wx.LIST_FORMAT_CENTRE)
         gridsizer.Add(projects_list, pos=(0,0))
 
         button_add_project = wx.Button(self, wx.ID_ANY, label='Добавить проект')
