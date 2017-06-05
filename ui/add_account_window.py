@@ -211,7 +211,6 @@ class AddAccountWindow(tk.Toplevel):
         else:
             self.button_save.configure(state="disabled")
 
-
 if __name__ == "__main__":
     root = thk.ThemedTk()
     root.set_theme("vista")
