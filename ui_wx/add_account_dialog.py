@@ -36,68 +36,75 @@ class ThreadedClient(threading.Thread):
 
 class AddAccountDialog(wx.Dialog):
     def __init__(self, parent, callback=None):
-        wx.Dialog.__init__(self, parent, wx.ID_ANY, 'Добавление аккаунта', size=(300, 400))
-        sizer = wx.BoxSizer(wx.VERTICAL)
+        self.width = 200
+        self.min_height = 200
+        self.max_height = 400
+        wx.Dialog.__init__(self, parent, wx.ID_ANY,
+                           size=(self.width, self.min_height))
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.gauge = wx.Gauge(self, wx.ID_ANY)
-        sizer.Add(self.gauge)
+        self.sizer.Add(self.gauge, flag=wx.EXPAND|wx.TOP|wx.BOTTOM|wx.RIGHT|wx.LEFT, border=10)
         self.gauge.Hide()
-        self.label_message = wx.StaticText(self, wx.ID_ANY, "", size=(200,30))
-        sizer.Add(self.label_message, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
+        self.label_message = wx.StaticText(self, wx.ID_ANY, "Добавление аккаунта", style=wx.ALIGN_CENTRE_HORIZONTAL)
+        self.sizer.Add(self.label_message, flag=wx.EXPAND|wx.TOP|wx.BOTTOM|wx.RIGHT|wx.LEFT, border=10)
 
         label_login = wx.StaticText(self, wx.ID_ANY, "Логин")
-        sizer.Add(label_login, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
+        self.sizer.Add(label_login, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
         self.text_login = wx.TextCtrl(self, wx.ID_ANY)
-        sizer.Add(self.text_login, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
+        self.Bind(wx.EVT_TEXT, self.text_change_handler, self.text_login)
+        self.sizer.Add(self.text_login, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
 
         label_password = wx.StaticText(self, wx.ID_ANY, "Пароль")
-        sizer.Add(label_password, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
+        self.sizer.Add(label_password, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
         self.text_password = wx.TextCtrl(self, wx.ID_ANY)
-        sizer.Add(self.text_password, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
+        self.Bind(wx.EVT_TEXT, self.text_change_handler, self.text_password)
+        self.sizer.Add(self.text_password, flag=wx.EXPAND|wx.RIGHT|wx.LEFT, border=10)
 
         sizer_h = wx.BoxSizer(wx.HORIZONTAL)
         self.checkbox_proxy = wx.CheckBox(self, wx.ID_ANY, "Прокси")
         self.Bind(wx.EVT_CHECKBOX, self.proxy_checked, self.checkbox_proxy)
-        sizer_h.Add(self.checkbox_proxy)
+        sizer_h.Add(self.checkbox_proxy, flag=wx.ALIGN_LEFT)
         button_save = wx.Button(self, wx.ID_ANY, label='Сохранить')
         self.Bind(wx.EVT_BUTTON, self.save_clicked, button_save)
-        sizer_h.Add(button_save)
-        sizer.Add(sizer_h)
+        sizer_h.Add(button_save, flag=wx.ALIGN_RIGHT)
+        self.sizer.Add(sizer_h, flag=wx.EXPAND|wx.RIGHT|wx.LEFT|wx.TOP|wx.BOTTOM, border=10)
 
         self.proxy_panel = wx.Panel(self)
 
         sizer_pane = wx.BoxSizer(wx.VERTICAL)
 
         label_ip = wx.StaticText(self.proxy_panel, wx.ID_ANY, "IP-адрес")
-        sizer_pane.Add(label_ip, flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=10)
+        sizer_pane.Add(label_ip, flag=wx.EXPAND | wx.RIGHT | wx.LEFT)
         text_ip = wx.TextCtrl(self.proxy_panel, wx.ID_ANY)
-        sizer_pane.Add(text_ip, flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=10)
+        sizer_pane.Add(text_ip, flag=wx.EXPAND | wx.RIGHT | wx.LEFT)
 
         label_port = wx.StaticText(self.proxy_panel, wx.ID_ANY, "Порт")
-        sizer_pane.Add(label_port, flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=10)
+        sizer_pane.Add(label_port, flag=wx.EXPAND | wx.RIGHT | wx.LEFT)
         text_port = wx.TextCtrl(self.proxy_panel, wx.ID_ANY)
-        sizer_pane.Add(text_port, flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=10)
+        sizer_pane.Add(text_port, flag=wx.EXPAND | wx.RIGHT | wx.LEFT)
 
         label_protocol = wx.StaticText(self.proxy_panel, wx.ID_ANY, "Протокол")
-        sizer_pane.Add(label_protocol, flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=10)
-        choise_protocol = wx.Choice(self.proxy_panel, wx.ID_ANY, size=(200, 30))
-        sizer_pane.Add(choise_protocol, flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=10)
+        sizer_pane.Add(label_protocol, flag=wx.EXPAND | wx.RIGHT | wx.LEFT)
+        choise_protocol = wx.Choice(self.proxy_panel, wx.ID_ANY)
+        sizer_pane.Add(choise_protocol, flag=wx.EXPAND | wx.RIGHT | wx.LEFT)
 
         label_proxy_login = wx.StaticText(self.proxy_panel, wx.ID_ANY, "Логин")
-        sizer_pane.Add(label_proxy_login, flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=10)
+        sizer_pane.Add(label_proxy_login, flag=wx.EXPAND | wx.RIGHT | wx.LEFT)
         text_proxy_login = wx.TextCtrl(self.proxy_panel, wx.ID_ANY)
-        sizer_pane.Add(text_proxy_login, flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=10)
+        sizer_pane.Add(text_proxy_login, flag=wx.EXPAND | wx.RIGHT | wx.LEFT)
 
         label_proxy_password = wx.StaticText(self.proxy_panel, wx.ID_ANY, "Пароль")
-        sizer_pane.Add(label_proxy_password, flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=10)
+        sizer_pane.Add(label_proxy_password, flag=wx.EXPAND | wx.RIGHT | wx.LEFT)
         text_proxy_password = wx.TextCtrl(self.proxy_panel, wx.ID_ANY)
-        sizer_pane.Add(text_proxy_password, flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=10)
+        sizer_pane.Add(text_proxy_password, flag=wx.EXPAND | wx.RIGHT | wx.LEFT)
 
         self.proxy_panel.SetSizer(sizer_pane)
 
-        sizer.Add(self.proxy_panel)
+        self.sizer.Add(self.proxy_panel, flag=wx.EXPAND | wx.RIGHT | wx.LEFT, border=10)
+        self.proxy_panel.Disable()
 
-        self.SetSizer(sizer)
+        self.SetSizer(self.sizer)
         self.Layout()
 
         self.proxy_panel.Hide()
@@ -109,10 +116,10 @@ class AddAccountDialog(wx.Dialog):
     def proxy_checked(self, event):
         if self.checkbox_proxy.GetValue():
             self.proxy_panel.Show()
-            self.SetSize((300,400))
+            self.SetSize((self.width, self.max_height))
         else:
             self.proxy_panel.Hide()
-            self.SetSize((300, 200))
+            self.SetSize((self.width, self.min_height))
 
     def save_clicked(self, event):
         self.label_message.SetLabel("")
@@ -122,14 +129,23 @@ class AddAccountDialog(wx.Dialog):
         if db.is_exist_account(login):
             self.label_message.Show()
             self.label_message.SetLabel("Аккаунт уже есть в базе")
+            self.sizer.Layout()
             return
         self.gauge.Show()
+        self.sizer.Layout()
         self.gauge.Pulse()
 
         self.thread = ThreadedClient(self.queue, login, password, True)
         self.thread.start()
         wx.CallLater(500, self.listen_queue)
         #self.master.after(200, self.listen_queue)
+
+    def text_change_handler(self, event):
+        if self.text_login.GetValue() and self.text_password.GetValue():
+            self.label_message.SetLabel("Добавить аккаунт")
+        else:
+            self.label_message.SetLabel("Пусто")
+        self.sizer.Layout()
 
     def listen_queue(self):
         try:
@@ -156,13 +172,14 @@ class AddAccountDialog(wx.Dialog):
             self.label_message.Show()
             self.label_message.SetLabel("")
 
+
 def callback(account):
     db.create_account(account)
 
 if __name__ == "__main__":
     db.initialize()
     app = wx.App()
-    frame = wx.Frame(None, wx.ID_ANY, size=(400, 200));
+    frame = wx.Frame(None, wx.ID_ANY);
 
     dialog = AddAccountDialog(frame, callback)
     dialog.ShowModal()
