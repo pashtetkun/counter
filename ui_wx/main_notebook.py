@@ -14,13 +14,15 @@ class MainNotebook(wx.Notebook):
         panel3 = wx.Panel(self)
         panel4 = wx.Panel(self)
         self.AddPage(panel0, 'Менеджер проектов')
-        self.AddPage(panel1, 'Менеджер заданий')
-        self.AddPage(panel2, 'Сбор аудитории')
-        self.AddPage(panel3, 'Настройки')
-        self.AddPage(panel4, 'Логи')
+        self.AddPage(panel1, 'Менеджер заданий ')
+        self.AddPage(panel2, 'Сбор аудитории   ')
+        self.AddPage(panel3, 'Настройки        ')
+        self.AddPage(panel4, 'Логи             ')
 
         self.SetBackgroundColour('gray')
-        self.SetFont(wx.Font(wx.FontInfo(14)))
+        self.SetFont(wx.Font(wx.FontInfo(16)))
+        #self.SetPadding((5,5))
+        #self.SetWindowStyle(wx.NB_FIXEDWIDTH)
 
 
 if __name__ == "__main__":
