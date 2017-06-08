@@ -13,49 +13,49 @@ class ProjectCard(wx.Panel):
         self.new_mode = False
 
     def do_layout(self):
-        gridsizer = wx.GridBagSizer(vgap=5, hgap = 5)
+        sizer = wx.GridBagSizer(vgap=5, hgap = 5)
 
         self.name_text = wx.TextCtrl(self, wx.ID_ANY, name='name')
-        gridsizer.Add(self.name_text, pos=(0,0), flag=wx.EXPAND)
+        sizer.Add(self.name_text, pos=(0,0), flag=wx.EXPAND)
         accounts_list = wx.ListCtrl(self, wx.ID_ANY, style=wx.LC_REPORT, size=(200, 200))
-        gridsizer.Add(accounts_list, pos=(1, 0), span=(4, 1))
+        sizer.Add(accounts_list, pos=(1, 0), span=(4, 1))
 
         button_add_account = wx.Button(self, wx.ID_ANY, label="Добавить аккаунт")
-        self.Bind(wx.EVT_BUTTON, self.addAccountClick, button_add_account)
-        gridsizer.Add(button_add_account, pos=(5,0), flag=wx.EXPAND)
+        self.Bind(wx.EVT_BUTTON, self.add_account_click, button_add_account)
+        sizer.Add(button_add_account, pos=(5,0), flag=wx.EXPAND)
 
         self.message_text = wx.StaticText(self, wx.ID_ANY, "")
-        gridsizer.Add(self.message_text, pos=(0, 1), flag=wx.EXPAND)
+        sizer.Add(self.message_text, pos=(0, 1), flag=wx.EXPAND)
         label_loadfromfile = wx.StaticText(self, wx.ID_ANY, "Загрузить аккаунты из списка")
-        gridsizer.Add(label_loadfromfile, pos=(1,1))
+        sizer.Add(label_loadfromfile, pos=(1,1))
 
         text_loadfromfile = wx.TextCtrl(self, wx.ID_ANY)
-        gridsizer.Add(text_loadfromfile, pos=(2,1), flag=wx.EXPAND)
+        sizer.Add(text_loadfromfile, pos=(2,1), flag=wx.EXPAND)
         button_loadfromfile = wx.Button(self, wx.ID_ANY, label="Загрузить")
-        gridsizer.Add(button_loadfromfile, pos=(2,2))
+        sizer.Add(button_loadfromfile, pos=(2,2))
 
         label_choice = wx.StaticText(self, wx.ID_ANY, "Выбрать из имеющихся")
-        gridsizer.Add(label_choice, pos=(3,1))
-        choise = wx.Choice(self, wx.ID_ANY, size=(200, 30))
-        gridsizer.Add(choise, pos=(4,1))
+        sizer.Add(label_choice, pos=(3,1))
+        choice = wx.Choice(self, wx.ID_ANY, size=(200, 30))
+        sizer.Add(choice, pos=(4,1))
         button_choose = wx.Button(self, wx.ID_ANY, "Выбрать")
-        gridsizer.Add(button_choose, pos=(4,2))
+        sizer.Add(button_choose, pos=(4,2))
 
-        button_save = wx.Button(self, wx.ID_ANY, label="Сохранить")
-        self.Bind(wx.EVT_BUTTON, self.saveClick, button_save)
-        gridsizer.Add(button_save, pos=(5, 2))
+        self.button_save = wx.Button(self, wx.ID_ANY, label="Сохранить")
+        self.button_save.Bind(wx.EVT_BUTTON, self.save_click)
+        sizer.Add(self.button_save, pos=(5, 2))
 
-        self.SetSizer(gridsizer)
+        self.SetSizer(sizer)
         self.Layout()
 
-    def addAccountClick(self, event):
+    def add_account_click(self, event):
         dialog = AddAccountDialog(self.Parent)
         dialog.ShowModal()
         dialog.Destroy()
 
-    def saveClick(self, event):
+    def save_click(self, event):
         name = self.name_text.GetValue()
-        if not self.checkName(name):
+        if not self.check_name(name):
             self.message_text.SetLabel('need unique name')
             return
         if self.new_mode:
@@ -67,14 +67,12 @@ class ProjectCard(wx.Panel):
             pass
 
         project_manager = self.GetParent()
-        project_manager.refreshProjects()
+        project_manager.refresh_projects(name)
 
-
-
-    def checkName(self, name):
+    def check_name(self, name):
         project_manager = self.GetParent()
         if self.new_mode:
-            if next((x for x in project_manager.projects if x.name == name), None):
+            if next((x for x in list(project_manager.projects_map.values()) if x.name == name), None):
                 return False
         else:
             #id = self.table_projects.current_project.id
@@ -83,61 +81,83 @@ class ProjectCard(wx.Panel):
             pass
         return True
 
-
+    def show_values(self, project):
+        self.Enable()
+        self.name_text.SetValue(project.name)
 
 
 class ProjectManager(wx.Panel):
     def __init__(self, parent):
         super(ProjectManager, self).__init__(parent)
         self.do_layout()
-        self.projects = []
-        self.refreshProjects()
+        self.projects_map = {}
+        self.refresh_projects()
+
+        self.project_card.Disable()
+        self.button_delete_project.Disable()
 
     def do_layout(self):
-        gridsizer = wx.GridBagSizer(vgap=5, hgap=5)
+        sizer = wx.GridBagSizer(vgap=5, hgap=5)
 
         self.projects_list = wx.ListCtrl(self, wx.ID_ANY, style=wx.LC_REPORT, size=(200, 300))
         self.projects_list.InsertColumn(0, "Проекты", width=200, format=wx.LIST_FORMAT_CENTRE)
-        gridsizer.Add(self.projects_list, pos=(0,0))
+        self.projects_list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_project_selected)
+        sizer.Add(self.projects_list, pos=(0,0))
 
-        button_add_project = wx.Button(self, wx.ID_ANY, label='Добавить проект')
-        self.Bind(wx.EVT_BUTTON, self.addProjectClick, button_add_project)
-        gridsizer.Add(button_add_project, pos=(1,0), flag=wx.EXPAND)
+        self.button_add_project = wx.Button(self, wx.ID_ANY, label='Добавить проект')
+        self.button_add_project.Bind(wx.EVT_BUTTON, self.add_project_click)
+        sizer.Add(self.button_add_project, pos=(1,0), flag=wx.EXPAND)
 
         self.project_card = ProjectCard(self)
-        gridsizer.Add(self.project_card, pos=(0,1))
+        sizer.Add(self.project_card, pos=(0,1))
 
         buttons_boxsizer = wx.BoxSizer()
         self.button_delete_project = wx.Button(self, wx.ID_ANY, label='Удалить проект', size=(200, 30))
+        self.button_delete_project.Bind(wx.EVT_BUTTON, self.delete_project_click)
         buttons_boxsizer.Add(self.button_delete_project)
         button_about_license = wx.Button(self, wx.ID_ANY, label='Информация о лицензии')
         buttons_boxsizer.Add(button_about_license, flag=wx.EXPAND)
-        gridsizer.Add(buttons_boxsizer, pos=(1,1))
+        sizer.Add(buttons_boxsizer, pos=(1,1))
 
-        self.SetSizer(gridsizer)
+        self.SetSizer(sizer)
         self.Layout()
-
 
     def clear_values(self):
         text_login = wx.FindWindowByName('name', self.project_card)
         text_login.SetValue('')
 
-    def addProjectClick(self, event):
+    def add_project_click(self, event):
         self.project_card.Enable()
         self.clear_values()
         self.project_card.new_mode = True
 
-    def refreshProjects(self):
-        self.projects = db.get_all_projects()
-        if not self.projects:
+    def refresh_projects(self, selected=None):
+        projects = db.get_all_projects()
+        if not projects:
             self.project_card.Disable()
             self.button_delete_project.Disable()
 
         self.projects_list.DeleteAllItems()
-        for project in self.projects:
+        for idx, project in enumerate(projects):
             self.projects_list.Append([project.name])
+            self.projects_map[idx] = project
+            if project.name == selected:
+                self.projects_list.Select(idx)
+
         self.projects_list.Layout()
 
+    def on_project_selected(self, event):
+        project = self.projects_map[event.Item.Id]
+        self.project_card.show_values(project)
+        self.button_delete_project.Enable()
+
+    def delete_project_click(self, event):
+        project = self.projects_map[self.projects_list.GetFirstSelected()]
+        dlg = wx.MessageBox(message="Удалить проект '%s'?" % project.name, caption='Удаление',
+                               style=wx.YES_NO | wx.NO_DEFAULT | wx.ICON_QUESTION)
+        if dlg == wx.YES:
+            db.delete_project(project.name)
+            self.refresh_projects()
 
 
 if __name__ == "__main__":
