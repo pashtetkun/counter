@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import wx
+import dbmanager as db
 from ui_wx.main_notebook import MainNotebook
 
 
@@ -21,6 +22,7 @@ class MainFrame(wx.Frame):
         self.Layout()
 
 if __name__ == "__main__":
+    db.initialize()
     app = wx.App()
     frame = MainFrame(1000, 500);
     frame.Show(True)

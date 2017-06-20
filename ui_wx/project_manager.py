@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import wx
+import wx.lib.agw.ultimatelistctrl as ulc
 from ui_wx.add_account_dialog import AddAccountDialog
 import dbmanager as db
 
@@ -99,7 +100,11 @@ class ProjectManager(wx.Panel):
     def do_layout(self):
         sizer = wx.GridBagSizer(vgap=5, hgap=5)
 
-        self.projects_list = wx.ListCtrl(self, wx.ID_ANY, style=wx.LC_REPORT, size=(200, 300))
+        #self.projects_list = wx.ListCtrl(self, wx.ID_ANY, style=wx.LC_REPORT, size=(200, 300))
+        self.projects_list = ulc.UltimateListCtrl(self,
+                                                  wx.ID_ANY,
+                                                  agwStyle=wx.LC_REPORT | wx.LC_VRULES | wx.LC_HRULES | wx.LC_SINGLE_SEL,
+                                                  size=(200, 300))
         self.projects_list.InsertColumn(0, "Проекты", width=200, format=wx.LIST_FORMAT_CENTRE)
         self.projects_list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_project_selected)
         sizer.Add(self.projects_list, pos=(0,0))
