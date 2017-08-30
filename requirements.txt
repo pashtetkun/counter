@@ -1,0 +1,11 @@
+certifi==2017.7.27.1
+chardet==3.0.4
+cx-Freeze==5.0.2
+Cython==0.26.1
+idna==2.6
+peewee==2.10.1
+requests==2.18.4
+six==1.10.0
+ttkthemes==1.5.0
+urllib3==1.22
+wxPython==4.0.0b1
