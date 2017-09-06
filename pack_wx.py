@@ -11,7 +11,10 @@ buildOptions = dict(
     packages = ["wx", "idna"],
     excludes = [],
     includes = [],
-    include_files=[]
+    include_files=['c:/Python36-32/DLLs/sqlite3.dll'#,
+                   #os.path.join(os.getcwd(), 'smoking.ico'),
+                   #os.path.join(os.getcwd(), 'Smoking.gif')
+    ]
 )
 
 import sys
